@@ -46,6 +46,7 @@ class Game:
             self.render_on_loop(level)
 
     def on_event(self, event):
+        # quit if the quit button was pressed
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
@@ -60,8 +61,10 @@ class Game:
         self.screen.fill(Color.grey)
         str_caption = "%.f FPS" % self.clock.get_fps()
         pygame.display.set_caption(str_caption)
+
         for tile in level.mapAsTileRows:
             self.screen.blit(tile.bg_img, tile.tile_pos)
+
         pygame.display.flip()
 
 
@@ -135,6 +138,13 @@ class MineTile(Tile):
         self.tile_pos = tile_pos
 
 
+class LakeTile(Tile):
+    def __init__(self, tile_pos):
+        self.bg_img = pygame.image.load("pic/lakeTile.png")
+        self.name = "lakeTile"
+        self.tile_pos = tile_pos
+
+
 def createTile(shortcut, pos):
     # type: (String) -> Tile
     if shortcut == "N":
@@ -143,21 +153,23 @@ def createTile(shortcut, pos):
         return ForestTile(pos)
     elif shortcut == "M":
         return MineTile(pos)
+    elif shortcut == "L":
+        return LakeTile(pos)
 
 
 class Level:
     mapAsTileRows = []
     structures = []
-    pos_y = 20
-    pos_x = 20
+    pos_y = 40
+    pos_x = 40
 
     def __init__(self, save_game, map_rows):
         for row in map_rows:
-            self.pos_y += 20
+            self.pos_y += 40
             for shortcut in row:
-                self.pos_x += 20
+                self.pos_x += 40
                 self.mapAsTileRows.append(createTile(shortcut, (self.pos_x, self.pos_y)))
-            self.pos_x = 20
+            self.pos_x = 40
         for structure in save_game:
             self.structures.append(structure)
 
