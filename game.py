@@ -2,6 +2,8 @@
 import sys
 import json
 
+import Tiles
+
 __author__ = "Noah Ruben"
 __version__ = "v1.0"
 
@@ -105,56 +107,19 @@ class LevelParser:
         return self.level
 
 
-class Tile:
-    name = None
-    has_structure = None
-    bg_img = None
-    tile_pos = None
 
-    def __init__(self, name, bg_img, tile_pos):
-        self.tile_pos = tile_pos
-        self.name = name
-        self.bg_img = bg_img
-
-
-class NormalTile(Tile):
-    def __init__(self, tile_pos):
-        self.bg_img = pygame.image.load("pic/normTile.png")
-        self.name = "normTile"
-        self.tile_pos = tile_pos
-
-
-class ForestTile(Tile):
-    def __init__(self, tile_pos):
-        self.bg_img = pygame.image.load("pic/forestTile.png")
-        self.name = "forestTile"
-        self.tile_pos = tile_pos
-
-
-class MineTile(Tile):
-    def __init__(self, tile_pos):
-        self.bg_img = pygame.image.load("pic/mineTile.png")
-        self.name = "mineTile"
-        self.tile_pos = tile_pos
-
-
-class LakeTile(Tile):
-    def __init__(self, tile_pos):
-        self.bg_img = pygame.image.load("pic/lakeTile.png")
-        self.name = "lakeTile"
-        self.tile_pos = tile_pos
 
 
 def createTile(shortcut, pos):
     # type: (String) -> Tile
     if shortcut == "N":
-        return NormalTile(pos)
+        return Tiles.NormalTile(pos)
     elif shortcut == "W":
-        return ForestTile(pos)
+        return Tiles.ForestTile(pos)
     elif shortcut == "M":
-        return MineTile(pos)
+        return Tiles.MineTile(pos)
     elif shortcut == "L":
-        return LakeTile(pos)
+        return Tiles.LakeTile(pos)
 
 
 class Level:
@@ -173,7 +138,7 @@ class Level:
         for structure in save_game:
             self.structures.append(structure)
 
-        print "mapAsTileRows: ", self.mapAsTileRows
+        #print "mapAsTileRows: ", self.mapAsTileRows
         print "structures: ", self.structures
 
     def __str__(self):
