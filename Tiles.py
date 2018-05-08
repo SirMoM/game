@@ -6,7 +6,7 @@ class Tile:
     bg_img = None
     tile_pos = None
     associated_structure_pos = None
-    has_structure = None
+    has_structure = False
     structure = None
 
     def __init__(self, name, bg_img, tile_pos):
@@ -18,11 +18,11 @@ class Tile:
     def __str__(self):
         out_str = ""
         out_str += self.name + " Tile Pos:" + str(self.tile_pos[0]) + ", " + str(self.tile_pos[1]) + " Structure: " + self.structure.__str__()
-        print(out_str)
         return out_str
 
-    def set_structure(self, structure):
-        self.structure = structure
+    def set_structure(self, struct):
+        self.has_structure = True
+        self.structure = struct
 
     def get_structure(self):
         return self.structure

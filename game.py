@@ -70,8 +70,9 @@ class Game:
         for tile in level.mapAsTileRows:
             self.screen.blit(tile.bg_img, tile.tile_pos)
 
-        for structure in level.structures:
-            self.screen.blit(structure.bg_img, structure.structure_pos)
+            # Draw ggf. structures
+            if tile.has_structure == False:
+                self.screen.blit(tile.get_structure().bg_img, tile.associated_structure_pos)
 
         pygame.display.flip()
 
@@ -105,7 +106,7 @@ class LevelParser:
         for r in sg[self.structuresVar]:
             self.structuresAsRowArray.append(r["row"])
 
-        print(self.structuresAsRowArray)
+        print("structuresAsRowArray: ", self.structuresAsRowArray)
 
         self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
 
@@ -125,10 +126,10 @@ def create_tile(shortcut, pos):
         return Tiles.LakeTile(pos)
 
 
-def create_structure(shortcut, pos):
+def create_structure(shortcut):
     # type: () -> Structures
     if shortcut == "LJ":
-        return Structures.LumberJack(pos)
+        return Structures.LumberJack()
     elif shortcut == "Filler":
         pass
     else:
@@ -137,7 +138,6 @@ def create_structure(shortcut, pos):
 
 class Level:
     mapAsTileRows = []
-    structures = []
     pos_y = 40
     pos_x = 40
 
@@ -152,18 +152,17 @@ class Level:
         self.pos_y = 40
         self.pos_x = 40
 
-        # TODO strukture pos in Tile auslagern ?
-        # TODO how to get the tile?
-        # TODO tile unabhäning ?
         counter = 0
         for shortcut_structure_array in save_game:
             for shortcut_structure in shortcut_structure_array:
-                print("Counter: ", counter, "Item: ", shortcut_structure, self.mapAsTileRows[counter])
-                self.mapAsTileRows[counter].set = create_structure(shortcut_structure, self.mapAsTileRows[counter].associated_structure_pos)
+                print("##")
+                print(create_structure(shortcut_structure))
+                self.mapAsTileRows[counter].set_structure(
+                    create_structure(shortcut_structure))
+                print("Counter: ", counter, "Item: ", shortcut_structure)
+                print(self.mapAsTileRows[counter])
+                print("##")
                 counter += 1
-
-        # print "mapAsTileRows: ", self.mapAsTileRows
-        print("Structures: ", self.structures)
 
     def __str__(self):
         str_names = ""  # type: str
