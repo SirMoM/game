@@ -96,13 +96,14 @@ class LevelParser:
         sg = json.loads(save_Game_As_String)
 
         print "Miscellaneous: ", level_map[self.mapVar][self.miscVar]
-        print "Save Game: ", sg["structures"]
 
         for rows in level_map[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
 
         for r in sg[self.structuresVar]:
             self.structuresAsRowArray.append(r["row"])
+
+        print self.structuresAsRowArray
 
         self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
 
@@ -145,10 +146,24 @@ class Level:
                 self.pos_x += 40
                 self.mapAsTileRows.append(createTile(shortcut_tile, (self.pos_x, self.pos_y)))
             self.pos_x = 40
-        for shortcut_structure in save_game:
-            tempStructure = createStructure(shortcut_structure, (self.pos_x, self.pos_y))
-            if tempStructure:
-                self.structures.append(tempStructure)
+
+        self.pos_y = 40
+        self.pos_x = 40
+
+        #TODO strukture pos in Tile auslagern ?
+        #TODO how to get the tile?
+        #TODO tile unabhäning ?
+        for shortcut_structure_array in save_game:
+            x_index = save_game.index(shortcut_structure_array)
+            for shortcut_structure in shortcut_structure_array:
+                y_index = shortcut_structure_array.index(shortcut_structure)
+                print "X: ", x_index, "Y: ", y_index, "Item: ", shortcut_structure
+                #print "shortcut_structure: ", shortcut_structure
+                tempStructure = createStructure(shortcut_structure, (self.pos_x, self.pos_y))
+                #print "tempStructure: ", tempStructure
+                if tempStructure is not False:
+                    self.structures.append(tempStructure)
+            self.pos_x = 40
 
         # print "mapAsTileRows: ", self.mapAsTileRows
         print "Structures: ", self.structures
