@@ -3,6 +3,7 @@ import sys
 import json
 
 import Tiles
+import Structures
 
 __author__ = "Noah Ruben"
 __version__ = "v1.0"
@@ -67,6 +68,9 @@ class Game:
         for tile in level.mapAsTileRows:
             self.screen.blit(tile.bg_img, tile.tile_pos)
 
+        for structure in level.structures:
+            self.screen.blit(structure.bg_img, structure.structure_pos)
+
         pygame.display.flip()
 
 
@@ -88,14 +92,13 @@ class LevelParser:
         map_As_String = self.mapFile.read()
         save_Game_As_String = self.saveGame.read()
 
-        level = json.loads(map_As_String)
+        level_map = json.loads(map_As_String)
         sg = json.loads(save_Game_As_String)
 
-        print "Miscellaneous: ", level[self.mapVar][self.miscVar]
-        print "Terrain: ", level[self.mapVar][self.terrainVar]
-        print "Structures: ", sg[self.structuresVar]
+        print "Miscellaneous: ", level_map[self.mapVar][self.miscVar]
+        print "Save Game: ", sg["structures"]
 
-        for rows in level[self.mapVar][self.terrainVar]:
+        for rows in level_map[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
 
         for r in sg[self.structuresVar]:
@@ -105,9 +108,6 @@ class LevelParser:
 
     def get_Level(self):
         return self.level
-
-
-
 
 
 def createTile(shortcut, pos):
@@ -122,6 +122,16 @@ def createTile(shortcut, pos):
         return Tiles.LakeTile(pos)
 
 
+def createStructure(shortcut, pos):
+    # type: (String) -> Structures
+    if shortcut == "LJ":
+        return Structures.LumberJack(pos)
+    elif shortcut == "Filler":
+        pass
+    else:
+        return False
+
+
 class Level:
     mapAsTileRows = []
     structures = []
@@ -131,15 +141,17 @@ class Level:
     def __init__(self, save_game, map_rows):
         for row in map_rows:
             self.pos_y += 40
-            for shortcut in row:
+            for shortcut_tile in row:
                 self.pos_x += 40
-                self.mapAsTileRows.append(createTile(shortcut, (self.pos_x, self.pos_y)))
+                self.mapAsTileRows.append(createTile(shortcut_tile, (self.pos_x, self.pos_y)))
             self.pos_x = 40
-        for structure in save_game:
-            self.structures.append(structure)
+        for shortcut_structure in save_game:
+            tempStructure = createStructure(shortcut_structure, (self.pos_x, self.pos_y))
+            if tempStructure:
+                self.structures.append(tempStructure)
 
-        #print "mapAsTileRows: ", self.mapAsTileRows
-        print "structures: ", self.structures
+        # print "mapAsTileRows: ", self.mapAsTileRows
+        print "Structures: ", self.structures
 
     def __str__(self):
         str_names = ""  # type: str
