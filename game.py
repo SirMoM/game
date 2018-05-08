@@ -39,13 +39,13 @@ class Game:
         while self.running:
 
             for event in pygame.event.get():
-                self.on_Event(event)
+                self.on_event(event)
 
             self.on_Loop()
 
             self.render_on_loop(level)
 
-    def on_Event(self, event):
+    def on_event(self, event):
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
@@ -56,11 +56,13 @@ class Game:
         self.playtime = self.millis / 1000
 
     def render_on_loop(self, level):
+        """:type level: Level"""
         self.screen.fill(Color.grey)
-        str = "%.f FPS" % self.clock.get_fps()
-        pygame.display.set_caption(str)
+        str_caption = "%.f FPS" % self.clock.get_fps()
+        pygame.display.set_caption(str_caption)
+        for tile in level.mapAsTileRows:
+            self.screen.blit(tile.bg_img, tile.tile_pos)
         pygame.display.flip()
-        self.screen.blit(level)
 
 
 class LevelParser:
@@ -106,8 +108,10 @@ class Tile:
     bg_img = None
     tile_pos = None
 
-    def __init__(self):
-        pass
+    def __init__(self, name, bg_img, tile_pos):
+        self.tile_pos = tile_pos
+        self.name = name
+        self.bg_img = bg_img
 
 
 class NormalTile(Tile):
@@ -124,22 +128,34 @@ class ForestTile(Tile):
         self.tile_pos = tile_pos
 
 
-def createTile(shortcut):
+class MineTile(Tile):
+    def __init__(self, tile_pos):
+        self.bg_img = pygame.image.load("pic/mineTile.png")
+        self.name = "mineTile"
+        self.tile_pos = tile_pos
+
+
+def createTile(shortcut, pos):
     # type: (String) -> Tile
     if shortcut == "N":
-        return NormalTile()
+        return NormalTile(pos)
     elif shortcut == "W":
-        return ForestTile()
+        return ForestTile(pos)
 
 
 class Level:
     mapAsTileRows = []
     structures = []
+    pos_y = 20
+    pos_x = 20
 
     def __init__(self, save_game, map_rows):
         for row in map_rows:
+            self.pos_y += 20
             for shortcut in row:
-                self.mapAsTileRows.append(createTile(shortcut))
+                self.pos_x += 20
+                self.mapAsTileRows.append(createTile(shortcut, (self.pos_x, self.pos_y)))
+            self.pos_x = 20
         for structure in save_game:
             self.structures.append(structure)
 
