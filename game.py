@@ -4,11 +4,12 @@ import json
 
 import Tiles
 import Structures
+import pygame
+
+from Tiles import Tile
 
 __author__ = "Noah Ruben"
 __version__ = "v1.0"
-
-import pygame
 
 
 class Color:
@@ -44,17 +45,18 @@ class Game:
             for event in pygame.event.get():
                 self.on_event(event)
 
-            self.on_Loop()
+            self.on_loop()
 
             self.render_on_loop(level)
 
     def on_event(self, event):
         # quit if the quit button was pressed
         if event.type == pygame.QUIT:
+            self.running = True
             pygame.quit()
             sys.exit()
 
-    def on_Loop(self):
+    def on_loop(self):
         # Time
         self.millis = self.clock.tick(self.FPS)
         self.playtime = self.millis / 1000
@@ -82,20 +84,20 @@ class LevelParser:
 
     structuresVar = "structures"
 
-    def __init__(self):
+    def __init__(self, level_path, save_game_path):
         self.structuresAsRowArray = []
         self.mapAsRowArray = []
 
-        self.mapFile = open("level.map", "r")
-        self.saveGame = open("save_game.json", "r")
+        self.mapFile = open(level_path, "r")
+        self.saveGame = open(save_game_path, "r")
 
-        map_As_String = self.mapFile.read()
-        save_Game_As_String = self.saveGame.read()
+        map_as_string = self.mapFile.read()
+        save_game_as_string = self.saveGame.read()
 
-        level_map = json.loads(map_As_String)
-        sg = json.loads(save_Game_As_String)
+        level_map = json.loads(map_as_string)
+        sg = json.loads(save_game_as_string)
 
-        print "Miscellaneous: ", level_map[self.mapVar][self.miscVar]
+        print("Miscellaneous: ", level_map[self.mapVar][self.miscVar])
 
         for rows in level_map[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
@@ -103,16 +105,16 @@ class LevelParser:
         for r in sg[self.structuresVar]:
             self.structuresAsRowArray.append(r["row"])
 
-        print self.structuresAsRowArray
+        print(self.structuresAsRowArray)
 
         self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
 
-    def get_Level(self):
+    def get_level(self):
         return self.level
 
 
-def createTile(shortcut, pos):
-    # type: (String) -> Tile
+def create_tile(shortcut, pos):
+    # type: () -> Tile
     if shortcut == "N":
         return Tiles.NormalTile(pos)
     elif shortcut == "W":
@@ -123,8 +125,8 @@ def createTile(shortcut, pos):
         return Tiles.LakeTile(pos)
 
 
-def createStructure(shortcut, pos):
-    # type: (String) -> Structures
+def create_structure(shortcut, pos):
+    # type: () -> Structures
     if shortcut == "LJ":
         return Structures.LumberJack(pos)
     elif shortcut == "Filler":
@@ -144,29 +146,29 @@ class Level:
             self.pos_y += 40
             for shortcut_tile in row:
                 self.pos_x += 40
-                self.mapAsTileRows.append(createTile(shortcut_tile, (self.pos_x, self.pos_y)))
+                self.mapAsTileRows.append(create_tile(shortcut_tile, (self.pos_x, self.pos_y)))
             self.pos_x = 40
 
         self.pos_y = 40
         self.pos_x = 40
 
-        #TODO strukture pos in Tile auslagern ?
-        #TODO how to get the tile?
-        #TODO tile unabhäning ?
+        # TODO strukture pos in Tile auslagern ?
+        # TODO how to get the tile?
+        # TODO tile unabhäning ?
         for shortcut_structure_array in save_game:
             x_index = save_game.index(shortcut_structure_array)
             for shortcut_structure in shortcut_structure_array:
                 y_index = shortcut_structure_array.index(shortcut_structure)
-                print "X: ", x_index, "Y: ", y_index, "Item: ", shortcut_structure
-                #print "shortcut_structure: ", shortcut_structure
-                tempStructure = createStructure(shortcut_structure, (self.pos_x, self.pos_y))
-                #print "tempStructure: ", tempStructure
-                if tempStructure is not False:
-                    self.structures.append(tempStructure)
+                print("X: ", x_index, "Y: ", y_index, "Item: ", shortcut_structure)
+                # print("shortcut_structure: ", shortcut_structure)
+                temp_structure = create_structure(shortcut_structure, (self.pos_x, self.pos_y))
+                # print("tempStructure: ", tempStructure)
+                if temp_structure is not False:
+                    self.structures.append(temp_structure)
             self.pos_x = 40
 
         # print "mapAsTileRows: ", self.mapAsTileRows
-        print "Structures: ", self.structures
+        print("Structures: ", self.structures)
 
     def __str__(self):
         str_names = ""  # type: str
@@ -177,6 +179,8 @@ class Level:
 
 
 if __name__ == '__main__':
+    map1 = "level.map"
+    map2 = "level2.map"
     game = Game()
-    lp = LevelParser()
-    game.execute(lp.get_Level())
+    lp = LevelParser(map2, "save_game.json")
+    game.execute(lp.get_level())

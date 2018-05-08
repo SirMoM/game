@@ -15,7 +15,6 @@ class Structure:
 
 class LumberJack(Structure):
     def __init__(self, structure_pos):
-        self.bg_img = pygame.image.load("pic/lumberJack.jpg")
+        self.bg_img = pygame.image.load("textures/structures/lumberJack.png")
         self.name = "Lumber Jack"
         self.structure_pos = structure_pos
-
