@@ -22,7 +22,7 @@ class Color:
     green = (0, 255, 0)
     blue = (0, 0, 255)
     purple = (150, 43, 186)
-    grey = (200, 200, 200)
+    grey = (150, 150, 150)
 
 
 class Game:
@@ -155,17 +155,12 @@ class Level:
         # TODO strukture pos in Tile auslagern ?
         # TODO how to get the tile?
         # TODO tile unabhäning ?
+        counter = 0
         for shortcut_structure_array in save_game:
-            x_index = save_game.index(shortcut_structure_array)
             for shortcut_structure in shortcut_structure_array:
-                y_index = shortcut_structure_array.index(shortcut_structure)
-                print("X: ", x_index, "Y: ", y_index, "Item: ", shortcut_structure)
-                # print("shortcut_structure: ", shortcut_structure)
-                temp_structure = create_structure(shortcut_structure, (self.pos_x, self.pos_y))
-                # print("tempStructure: ", tempStructure)
-                if temp_structure is not False:
-                    self.structures.append(temp_structure)
-            self.pos_x = 40
+                print("Counter: ", counter, "Item: ", shortcut_structure, self.mapAsTileRows[counter])
+                self.mapAsTileRows[counter].set = create_structure(shortcut_structure, self.mapAsTileRows[counter].associated_structure_pos)
+                counter += 1
 
         # print "mapAsTileRows: ", self.mapAsTileRows
         print("Structures: ", self.structures)
@@ -182,5 +177,5 @@ if __name__ == '__main__':
     map1 = "level.map"
     map2 = "level2.map"
     game = Game()
-    lp = LevelParser(map2, "save_game.json")
+    lp = LevelParser(map1, "save_game.json")
     game.execute(lp.get_level())

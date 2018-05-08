@@ -12,6 +12,11 @@ class Structure:
         self.name = name
         self.bg_img = bg_img
 
+    def __str__(self):
+        out_str = ""
+        out_str += self.name + "Structure Pos:" + self.structure_pos
+        return out_str
+
 
 class LumberJack(Structure):
     def __init__(self, structure_pos):
