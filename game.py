@@ -98,8 +98,21 @@ class LevelParser:
         print level.__str__()
 
 
-class Tile(object):
-    pass
+class Tile:
+    name = None
+    has_structure = None
+    bg_img = None
+
+class NormalTile(Tile):
+
+    def __init__(self):
+        pass
+    bg_img = pygame.image.load()
+    name = "normTile"
+
+
+def createTile(shortcut):
+    return Tile(shortcut)
 
 
 class Level:
@@ -108,8 +121,8 @@ class Level:
 
     def __init__(self, save_game, map_rows):
         for row in map_rows:
-            for tile in row:
-                self.mapAsTileRows.append(Tile(tile))
+            for shortcut in row:
+                self.mapAsTileRows.append(createTile(shortcut))
         for structure in save_game:
             self.structures.append(structure)
 
