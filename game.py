@@ -35,7 +35,7 @@ class Game:
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(Color.grey)
 
-    def execute(self):
+    def execute(self, level):
         while self.running:
 
             for event in pygame.event.get():
@@ -43,7 +43,7 @@ class Game:
 
             self.on_Loop()
 
-            self.render_On_Loop()
+            self.render_on_loop(level)
 
     def on_Event(self, event):
         if event.type == pygame.QUIT:
@@ -55,11 +55,12 @@ class Game:
         self.millis = self.clock.tick(self.FPS)
         self.playtime = self.millis / 1000
 
-    def render_On_Loop(self):
+    def render_on_loop(self, level):
         self.screen.fill(Color.grey)
         str = "%.f FPS" % self.clock.get_fps()
         pygame.display.set_caption(str)
         pygame.display.flip()
+        self.screen.blit(level)
 
 
 class LevelParser:
@@ -93,33 +94,38 @@ class LevelParser:
         for r in sg[self.structuresVar]:
             self.structuresAsRowArray.append(r["row"])
 
-        level = Level(self.structuresAsRowArray, self.mapAsRowArray)
+        self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
 
-        print level.__str__()
+    def get_Level(self):
+        return self.level
 
 
 class Tile:
     name = None
     has_structure = None
     bg_img = None
+    tile_pos = None
 
     def __init__(self):
         pass
 
 
 class NormalTile(Tile):
-    def __init__(self):
-        self.bg_img = pygame.image.load("/pic/normTile.png")
+    def __init__(self, tile_pos):
+        self.bg_img = pygame.image.load("pic/normTile.png")
         self.name = "normTile"
+        self.tile_pos = tile_pos
 
 
-class ForestTile(object):
-    def __init__(self):
-        self.bg_img = pygame.image.load("/pic/forestTile.png")
+class ForestTile(Tile):
+    def __init__(self, tile_pos):
+        self.bg_img = pygame.image.load("pic/forestTile.png")
         self.name = "forestTile"
+        self.tile_pos = tile_pos
 
 
 def createTile(shortcut):
+    # type: (String) -> Tile
     if shortcut == "N":
         return NormalTile()
     elif shortcut == "W":
@@ -137,11 +143,18 @@ class Level:
         for structure in save_game:
             self.structures.append(structure)
 
+        print "mapAsTileRows: ", self.mapAsTileRows
+        print "structures: ", self.structures
+
     def __str__(self):
-        return "mapAsTileRows: ", self.mapAsTileRows, "structures: ", self.structures
+        str_names = ""  # type: str
+        for row in self.mapAsTileRows:
+            str_names += row.name + ", "
+
+        return str_names
 
 
 if __name__ == '__main__':
     game = Game()
-    tile = LevelParser()
-    game.execute()
+    lp = LevelParser()
+    game.execute(lp.get_Level())
