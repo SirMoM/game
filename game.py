@@ -103,16 +103,27 @@ class Tile:
     has_structure = None
     bg_img = None
 
-class NormalTile(Tile):
-
     def __init__(self):
         pass
-    bg_img = pygame.image.load()
-    name = "normTile"
+
+
+class NormalTile(Tile):
+    def __init__(self):
+        self.bg_img = pygame.image.load("/pic/normTile.png")
+        self.name = "normTile"
+
+
+class ForestTile(object):
+    def __init__(self):
+        self.bg_img = pygame.image.load("/pic/forestTile.png")
+        self.name = "forestTile"
 
 
 def createTile(shortcut):
-    return Tile(shortcut)
+    if shortcut == "N":
+        return NormalTile()
+    elif shortcut == "W":
+        return ForestTile()
 
 
 class Level:
