@@ -141,6 +141,8 @@ def createTile(shortcut, pos):
         return NormalTile(pos)
     elif shortcut == "W":
         return ForestTile(pos)
+    elif shortcut == "M":
+        return MineTile(pos)
 
 
 class Level:
