@@ -20,9 +20,9 @@ class Tile:
         out_str += self.name + " Tile Pos:" + str(self.tile_pos[0]) + ", " + str(self.tile_pos[1]) + " Structure: " + self.structure.__str__()
         return out_str
 
-    def set_structure(self, struct):
+    def set_structure(self, structure):
         self.has_structure = True
-        self.structure = struct
+        self.structure = structure
 
     def get_structure(self):
         return self.structure

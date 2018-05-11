@@ -71,8 +71,8 @@ class Game:
             self.screen.blit(tile.bg_img, tile.tile_pos)
 
             # Draw ggf. structures
-            if tile.has_structure == False:
-                self.screen.blit(tile.get_structure().bg_img, tile.associated_structure_pos)
+            if tile.structure != False:
+                self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
 
         pygame.display.flip()
 
@@ -155,13 +155,7 @@ class Level:
         counter = 0
         for shortcut_structure_array in save_game:
             for shortcut_structure in shortcut_structure_array:
-                print("##")
-                print(create_structure(shortcut_structure))
-                self.mapAsTileRows[counter].set_structure(
-                    create_structure(shortcut_structure))
-                print("Counter: ", counter, "Item: ", shortcut_structure)
-                print(self.mapAsTileRows[counter])
-                print("##")
+                self.mapAsTileRows[counter].set_structure(create_structure(shortcut_structure))
                 counter += 1
 
     def __str__(self):

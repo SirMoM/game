@@ -3,19 +3,19 @@ import pygame
 
 class Structure:
     name = None
-    bg_img = None
+    structure_img = None
 
-    def __init__(self, name, bg_img):
+    def __init__(self, name, img):
         self.name = name
-        self.bg_img = bg_img
+        self.structure_img = img
 
     def __str__(self):
         out_str = ""
-        out_str += self.name
+        out_str += self.name + self.structure_img.__str__()
         return out_str
 
 
 class LumberJack(Structure):
     def __init__(self):
-        self.bg_img = pygame.image.load("textures/structures/lumberJack.png")
+        self.structure_img = pygame.image.load("textures\structures\lumberJack.png")
         self.name = "Lumber Jack"
