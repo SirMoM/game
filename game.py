@@ -27,54 +27,77 @@ class Color:
 
 class Game:
     running = False
-    FPS = 61
+    FPS = 60
+    level = None
 
     def __init__(self):
-        self.millis = None
-        self.playtime = None
+        self.millis = 0
+        self.playtime = 0
         self.running = True
         print("New Game")
         pygame.init()
+        pygame.font.init() #TODO as
+        self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(Color.grey)
+        self.every_sek = pygame.USEREVENT+1
 
-    def execute(self, level):
+    def execute(self):
         while self.running:
-
-            for event in pygame.event.get():
-                self.on_event(event)
+            self.on_event()
 
             self.on_loop()
 
-            self.render_on_loop(level)
+            self.render_on_loop(self.level)
 
-    def on_event(self, event):
-        # quit if the quit button was pressed
-        if event.type == pygame.QUIT:
-            self.running = True
-            pygame.quit()
-            sys.exit()
+    def on_event(self):
+        for event in pygame.event.get():
+
+            # quit if the quit button was pressed
+            if event.type == pygame.QUIT:
+                self.running = True
+                pygame.quit()
+                sys.exit()
 
     def on_loop(self):
         # Time
+        pygame.time.set_timer(self.every_sek, 100)
         self.millis = self.clock.tick(self.FPS)
-        self.playtime = self.millis / 1000
+        #self.clock.tick_busy_loop()
+        self.playtime += self.millis / 1000
+
+
+        for struct in self.level.structures:
+            if type(struct) is Structures.LumberJack:
+                self.level.wood += struct.resuccess_per_loop
 
     def render_on_loop(self, level):
         """:type level: Level"""
         self.screen.fill(Color.grey)
-        str_caption = "%.f FPS" % self.clock.get_fps()
+        str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
 
         for tile in level.mapAsTileRows:
             self.screen.blit(tile.bg_img, tile.tile_pos)
 
             # Draw ggf. structures
-            if tile.structure != False:
+            if tile.structure:
                 self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
 
+        self.render_reassures_bar()
         pygame.display.flip()
+
+    def render_reassures_bar(self):
+        if self.level.wood > 0:
+            self.screen.blit(pygame.image.load("textures/wood.png"), (10, 10))
+            text_surface = self.my_font.render(str(round(self.level.wood, 0)), False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 5))
+
+        if self.level.iron > 0:
+            self.screen.blit(pygame.image.load("textures/stone.png"), (10, 10))
+            text_surface = self.my_font.render(str(round(self.level.wood, 0)), False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 5))
 
 
 class LevelParser:
@@ -138,31 +161,37 @@ def create_structure(shortcut):
 
 class Level:
     mapAsTileRows = []
-    pos_y = 40
-    pos_x = 40
+    structures = []
+    wood = 0
+    stone = 0
+    iron = 0
 
     def __init__(self, save_game, map_rows):
+        pos_y = 40
+        pos_x = 40
         for row in map_rows:
-            self.pos_y += 40
+            pos_y += 40
             for shortcut_tile in row:
-                self.pos_x += 40
-                self.mapAsTileRows.append(create_tile(shortcut_tile, (self.pos_x, self.pos_y)))
-            self.pos_x = 40
-
-        self.pos_y = 40
-        self.pos_x = 40
+                pos_x += 40
+                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
+            pos_x = 40
 
         counter = 0
         for shortcut_structure_array in save_game:
             for shortcut_structure in shortcut_structure_array:
-                self.mapAsTileRows[counter].set_structure(create_structure(shortcut_structure))
+                temp_structure = create_structure(shortcut_structure)
+                self.structures.append(temp_structure)
+                self.mapAsTileRows[counter].set_structure(temp_structure)
                 counter += 1
+
+    def resources_as_string(self):
+        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
+        return resources_str
 
     def __str__(self):
         str_names = ""  # type: str
         for row in self.mapAsTileRows:
             str_names += row.name + ", "
-
         return str_names
 
 
@@ -171,4 +200,5 @@ if __name__ == '__main__':
     map2 = "level2.map"
     game = Game()
     lp = LevelParser(map1, "save_game.json")
-    game.execute(lp.get_level())
+    game.level = lp.get_level()
+    game.execute()

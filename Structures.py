@@ -2,6 +2,7 @@ import pygame
 
 
 class Structure:
+    resuccess_per_loop = None
     name = None
     structure_img = None
 
@@ -16,6 +17,9 @@ class Structure:
 
 
 class LumberJack(Structure):
+
+    resuccess_per_loop = 1/60
+
     def __init__(self):
         self.structure_img = pygame.image.load("textures\structures\lumberJack.png")
         self.name = "Lumber Jack"
