@@ -8,6 +8,7 @@ class Tile:
     associated_structure_pos = None
     has_structure = False
     structure = None
+    shortcut = "D"
 
     def __init__(self, name, bg_img, tile_pos):
         self.tile_pos = tile_pos
@@ -17,7 +18,8 @@ class Tile:
 
     def __str__(self):
         out_str = ""
-        out_str += self.name + " Tile Pos:" + str(self.tile_pos[0]) + ", " + str(self.tile_pos[1]) + " Structure: " + self.structure.__str__()
+        out_str += self.name + " Tile Pos:" + str(self.tile_pos[0]) + ", " + str(
+            self.tile_pos[1]) + " Structure: " + self.structure.__str__()
         return out_str
 
     def set_structure(self, structure):
@@ -29,6 +31,8 @@ class Tile:
 
 
 class NormalTile(Tile):
+    shortcut = "N"
+
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load("textures/tiles/normTile.png")
         self.name = "normTile"
@@ -37,6 +41,8 @@ class NormalTile(Tile):
 
 
 class ForestTile(Tile):
+    shortcut = "F"
+
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load("textures/tiles/forestTile.png")
         self.name = "forestTile"
@@ -45,6 +51,8 @@ class ForestTile(Tile):
 
 
 class MineTile(Tile):
+    shortcut = "PM"  # Potential Mine
+
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load("textures/tiles/mineTile.png")
         self.name = "mineTile"
@@ -53,8 +61,20 @@ class MineTile(Tile):
 
 
 class LakeTile(Tile):
+    shortcut = "L"
+
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load("textures/tiles/lakeTile.png")
         self.name = "lakeTile"
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
+
+
+class MountainTile(Tile):
+    shortcut = "M"
+
+    def __init__(self, tile_pos):
+        self.bg_img = pygame.image.load("textures/tiles/mountainTile.png")
+        self.name = "mountainTile"
+        self.tile_pos = tile_pos
+        self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 16)

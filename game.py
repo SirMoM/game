@@ -70,7 +70,9 @@ class Game:
 
         for struct in self.level.structures:
             if type(struct) is Structures.LumberJack:
-                self.level.wood += struct.resuccess_per_loop
+                self.level.wood += struct.resources_per_loop
+            elif type(struct) is Structures.Quarry:
+                self.level.stone += struct.resources_per_loop
 
     def render_on_loop(self, level):
         """:type level: Level"""
@@ -90,14 +92,14 @@ class Game:
 
     def render_reassures_bar(self):
         if self.level.wood > 0:
-            self.screen.blit(pygame.image.load("textures/wood.png"), (10, 10))
+            self.screen.blit(pygame.image.load("textures/resources/wood.png"), (10, 10))
             text_surface = self.my_font.render(str(round(self.level.wood, 0)), False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 5))
 
-        if self.level.iron > 0:
-            self.screen.blit(pygame.image.load("textures/stone.png"), (10, 10))
-            text_surface = self.my_font.render(str(round(self.level.wood, 0)), False, (0, 0, 0))
-            self.screen.blit(text_surface, (52, 5))
+        if self.level.stone > 0:
+            self.screen.blit(pygame.image.load("textures/resources/stone2.png"), (100, 10))
+            text_surface = self.my_font.render(str(round(self.level.stone, 0)), False, (0, 0, 0))
+            self.screen.blit(text_surface, (132, 5))
 
 
 class LevelParser:
@@ -138,23 +140,28 @@ class LevelParser:
 
 
 def create_tile(shortcut, pos):
-    # type: () -> Tile
-    if shortcut == "N":
-        return Tiles.NormalTile(pos)
-    elif shortcut == "W":
-        return Tiles.ForestTile(pos)
-    elif shortcut == "M":
-        return Tiles.MineTile(pos)
-    elif shortcut == "L":
-        return Tiles.LakeTile(pos)
 
+    # type: () -> Tile
+    if shortcut == Tiles.NormalTile.shortcut:
+        return Tiles.NormalTile(pos)
+    elif shortcut == Tiles.ForestTile.shortcut:
+        return Tiles.ForestTile(pos)
+    elif shortcut == Tiles.MineTile.shortcut:
+        return Tiles.MineTile(pos)
+    elif shortcut == Tiles.LakeTile.shortcut:
+        return Tiles.LakeTile(pos)
+    elif shortcut == Tiles.MountainTile.shortcut:
+        return Tiles.MountainTile(pos)
+    else:
+        print("There went something wrong for creating the Tile")
+        return Tiles.NormalTile(pos)
 
 def create_structure(shortcut):
     # type: () -> Structures
-    if shortcut == "LJ":
+    if shortcut == Structures.LumberJack.shortcut:
         return Structures.LumberJack()
-    elif shortcut == "Filler":
-        pass
+    elif shortcut == Structures.Quarry.shortcut:
+        return Structures.Quarry()
     else:
         return False
 
