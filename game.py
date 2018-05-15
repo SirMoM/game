@@ -36,12 +36,12 @@ class Game:
         self.running = True
         print("New Game")
         pygame.init()
-        pygame.font.init() #TODO as
+        pygame.font.init()  # TODO as
         self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(Color.grey)
-        self.every_sek = pygame.USEREVENT+1
+        self.every_sek = pygame.USEREVENT + 1
 
     def execute(self):
         while self.running:
@@ -54,6 +54,19 @@ class Game:
     def on_event(self):
         for event in pygame.event.get():
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+
+                print("Click: ", pos)
+                for tile in self.level.mapAsTileRows:
+                    if tile.get_rect().collidepoint(pos):
+                        print(tile.get_rect())
+                        print(tile)
+                        print("##############################")
+                    else:
+                        print("no")
+
+
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
                 self.running = True
@@ -64,9 +77,8 @@ class Game:
         # Time
         pygame.time.set_timer(self.every_sek, 100)
         self.millis = self.clock.tick(self.FPS)
-        #self.clock.tick_busy_loop()
+        # self.clock.tick_busy_loop()
         self.playtime += self.millis / 1000
-
 
         for struct in self.level.structures:
             if type(struct) is Structures.LumberJack:
@@ -140,7 +152,6 @@ class LevelParser:
 
 
 def create_tile(shortcut, pos):
-
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
         return Tiles.NormalTile(pos)
@@ -156,12 +167,15 @@ def create_tile(shortcut, pos):
         print("There went something wrong for creating the Tile")
         return Tiles.NormalTile(pos)
 
+
 def create_structure(shortcut):
     # type: () -> Structures
     if shortcut == Structures.LumberJack.shortcut:
         return Structures.LumberJack()
     elif shortcut == Structures.Quarry.shortcut:
         return Structures.Quarry()
+    elif shortcut == Structures.IronMine.shortcut:
+        return Structures.IronMine()
     else:
         return False
 

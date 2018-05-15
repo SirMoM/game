@@ -9,6 +9,7 @@ class Tile:
     has_structure = False
     structure = None
     shortcut = "D"
+    rect = None
 
     def __init__(self, name, bg_img, tile_pos):
         self.tile_pos = tile_pos
@@ -28,6 +29,11 @@ class Tile:
 
     def get_structure(self):
         return self.structure
+
+    def get_rect(self):
+        return pygame.Rect(self.associated_structure_pos[0], self.associated_structure_pos[1],
+                                         self.associated_structure_pos[0] + 32,
+                                         self.associated_structure_pos[1] + 32)
 
 
 class NormalTile(Tile):
@@ -57,7 +63,7 @@ class MineTile(Tile):
         self.bg_img = pygame.image.load("textures/tiles/mineTile.png")
         self.name = "mineTile"
         self.tile_pos = tile_pos
-        self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
+        self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 8)
 
 
 class LakeTile(Tile):

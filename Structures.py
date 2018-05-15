@@ -33,3 +33,12 @@ class Quarry(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load("textures/structures/quarry.png")
         self.name = "Quarry"
+
+
+class IronMine(Structure):
+    resources_per_loop = 1 / 180
+    shortcut = "IM"
+
+    def __init__(self):
+        self.structure_img = pygame.image.load("textures/structures/ironMine.png")
+        self.name = "Iron Mine"
