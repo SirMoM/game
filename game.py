@@ -66,7 +66,6 @@ class Game:
                     else:
                         print("no")
 
-
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
                 self.running = True
@@ -131,29 +130,26 @@ class LevelParser:
     terrainVar = "terrain"
     rowVar = "row"
     miscVar = "misc"
-
     structuresVar = "structures"
 
-    def __init__(self, level_path, save_game_path):
+    def __init__(self, save_game_path):
         self.structuresAsRowArray = []
         self.mapAsRowArray = []
 
-        self.mapFile = open(level_path, "r")
         self.saveGame = open(save_game_path, "r")
 
-        map_as_string = self.mapFile.read()
         save_game_as_string = self.saveGame.read()
 
-        level_map = json.loads(map_as_string)
         sg = json.loads(save_game_as_string)
 
-        print("Miscellaneous: ", level_map[self.mapVar][self.miscVar])
+        print("Miscellaneous: ", sg[self.mapVar][self.miscVar])
 
-        for rows in level_map[self.mapVar][self.terrainVar]:
+        for rows in sg[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
 
-        for r in sg[self.structuresVar]:
-            self.structuresAsRowArray.append(r["row"])
+        if self.structuresVar in sg:
+            for r in sg[self.structuresVar]:
+                self.structuresAsRowArray.append(r["row"])
 
         print("structuresAsRowArray: ", self.structuresAsRowArray)
 
@@ -232,6 +228,6 @@ if __name__ == '__main__':
     map1 = "level.map"
     map2 = "level2.map"
     game = Game()
-    lp = LevelParser("save_game.json", "save_game.json")
+    lp = LevelParser(map2)
     game.level = lp.get_level()
     game.execute()
