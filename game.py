@@ -228,6 +228,6 @@ if __name__ == '__main__':
     map1 = "level.map"
     map2 = "level2.map"
     game = Game()
-    lp = LevelParser(map2)
+    lp = LevelParser("save_game.json")
     game.level = lp.get_level()
     game.execute()
