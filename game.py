@@ -85,12 +85,17 @@ class Game:
                 self.level.wood += struct.resources_per_loop
             elif type(struct) is Structures.Quarry:
                 self.level.stone += struct.resources_per_loop
+            elif type(struct) is Structures.IronMine:
+                self.level.iron += struct.resources_per_loop
 
     def render_on_loop(self, level):
         """:type level: Level"""
+
         self.screen.fill(Color.grey)
         str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
+
+        self.render_reassures_bar()
 
         for tile in level.mapAsTileRows:
             self.screen.blit(tile.bg_img, tile.tile_pos)
@@ -99,19 +104,26 @@ class Game:
             if tile.structure:
                 self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
 
-        self.render_reassures_bar()
         pygame.display.flip()
 
     def render_reassures_bar(self):
         if self.level.wood > 0:
             self.screen.blit(pygame.image.load("textures/resources/wood.png"), (10, 10))
-            text_surface = self.my_font.render(str(round(self.level.wood, 0)), False, (0, 0, 0))
+            str_anz_wood = ": %.f" % self.level.wood
+            text_surface = self.my_font.render(str_anz_wood, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 5))
 
         if self.level.stone > 0:
-            self.screen.blit(pygame.image.load("textures/resources/stone2.png"), (100, 10))
-            text_surface = self.my_font.render(str(round(self.level.stone, 0)), False, (0, 0, 0))
-            self.screen.blit(text_surface, (132, 5))
+            self.screen.blit(pygame.image.load("textures/resources/stone2.png"), (10, 42))
+            str_anz_stone = ": %.f" % self.level.stone
+            text_surface = self.my_font.render(str_anz_stone, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 42))
+
+        if self.level.iron > 0:
+            self.screen.blit(pygame.image.load("textures/resources/iron.png"), (10, 74))
+            str_anz_iron = ": %.f" % self.level.iron
+            text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 74))
 
 
 class LevelParser:
@@ -189,13 +201,13 @@ class Level:
 
     def __init__(self, save_game, map_rows):
         pos_y = 40
-        pos_x = 40
+        pos_x = 100
         for row in map_rows:
             pos_y += 40
             for shortcut_tile in row:
                 pos_x += 40
                 self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
-            pos_x = 40
+            pos_x = 100
 
         counter = 0
         for shortcut_structure_array in save_game:
@@ -220,6 +232,6 @@ if __name__ == '__main__':
     map1 = "level.map"
     map2 = "level2.map"
     game = Game()
-    lp = LevelParser(map1, "save_game.json")
+    lp = LevelParser("save_game.json", "save_game.json")
     game.level = lp.get_level()
     game.execute()
