@@ -32,8 +32,17 @@ class Tile:
 
     def get_rect(self):
         return pygame.Rect(self.associated_structure_pos[0], self.associated_structure_pos[1],
-                                         self.associated_structure_pos[0] + 32,
-                                         self.associated_structure_pos[1] + 32)
+                           self.associated_structure_pos[0] + 32,
+                           self.associated_structure_pos[1] + 32)
+
+    def is_point_in_tile(self, xPos, yPos):
+        if self.tile_pos[0] + 32 > xPos > self.tile_pos[0]:
+            if self.tile_pos[1] + 32 > yPos > self.tile_pos[1]:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
 class NormalTile(Tile):

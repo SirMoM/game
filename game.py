@@ -2,6 +2,7 @@
 import sys
 import json
 
+import Screens
 import Tiles
 import Structures
 import pygame
@@ -36,7 +37,7 @@ class Game:
         self.running = True
         print("New Game")
         pygame.init()
-        pygame.font.init()  # TODO as
+        pygame.font.init()
         self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((500, 500))
@@ -67,16 +68,12 @@ class Game:
                         self.level.iron += structures.resources_per_loop
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = event.pos
+                xPos, yPos = pygame.mouse.get_pos()
 
-                print("Click: ", pos)
+                print("Click: ", xPos, yPos)
                 for tile in self.level.mapAsTileRows:
-                    if tile.get_rect().collidepoint(pos):
-                        print(tile.get_rect())
-                        print(tile)
-                        print("##############################")
-                    else:
-                        print("no")
+                    if tile.is_point_in_tile(xPos, yPos):
+                        tile_screen = Screens.TileScreen(tile)
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -109,23 +106,62 @@ class Game:
         pygame.display.flip()
 
     def render_reassures_bar(self):
-        if self.level.wood > 0:
+        if self.level.wood >= 1:
             self.screen.blit(pygame.image.load("textures/resources/wood.png"), (10, 10))
             str_anz_wood = ": %.f" % self.level.wood
             text_surface = self.my_font.render(str_anz_wood, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 5))
 
-        if self.level.stone > 0:
+        if self.level.stone >= 1:
             self.screen.blit(pygame.image.load("textures/resources/stone2.png"), (10, 42))
             str_anz_stone = ": %.f" % self.level.stone
             text_surface = self.my_font.render(str_anz_stone, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 42))
 
-        if self.level.iron > 0:
+        if self.level.iron >= 1:
             self.screen.blit(pygame.image.load("textures/resources/iron.png"), (10, 74))
             str_anz_iron = ": %.f" % self.level.iron
             text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
+
+    def create_tile_screen(self):
+        tile_screen = pygame.display.set_mode((200, 400))
+
+
+class Level:
+    mapAsTileRows = []
+    structures = []
+    wood = 0
+    stone = 0
+    iron = 0
+
+    def __init__(self, save_game, map_rows):
+        pos_y = 40
+        pos_x = 100
+        for row in map_rows:
+            pos_y += 40
+            for shortcut_tile in row:
+                pos_x += 40
+                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
+            pos_x = 100
+
+        counter = 0
+        for shortcut_structure_array in save_game:
+            for shortcut_structure in shortcut_structure_array:
+                temp_structure = create_structure(shortcut_structure)
+                self.structures.append(temp_structure)
+                self.mapAsTileRows[counter].set_structure(temp_structure)
+                counter += 1
+
+    def resources_as_string(self):
+        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
+        return resources_str
+
+    def __str__(self):
+        str_names = ""  # type: str
+        for row in self.mapAsTileRows:
+            str_names += row.name + ", "
+        return str_names
 
 
 class LevelParser:
@@ -134,6 +170,7 @@ class LevelParser:
     rowVar = "row"
     miscVar = "misc"
     structuresVar = "structures"
+    seasonVar = "season"
 
     def __init__(self, save_game_path):
         self.structuresAsRowArray = []
@@ -143,15 +180,16 @@ class LevelParser:
 
         save_game_as_string = self.saveGame.read()
 
-        sg = json.loads(save_game_as_string)
+        save_game_as_json_objekt = json.loads(save_game_as_string)
 
-        print("Miscellaneous: ", sg[self.mapVar][self.miscVar])
+        print("Miscellaneous: ", save_game_as_json_objekt[self.mapVar][self.miscVar])
+        print("Season: ", save_game_as_json_objekt[self.mapVar][self.seasonVar])
 
-        for rows in sg[self.mapVar][self.terrainVar]:
+        for rows in save_game_as_json_objekt[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
 
-        if self.structuresVar in sg:
-            for r in sg[self.structuresVar]:
+        if self.structuresVar in save_game_as_json_objekt:
+            for r in save_game_as_json_objekt[self.structuresVar]:
                 self.structuresAsRowArray.append(r["row"])
 
         print("structuresAsRowArray: ", self.structuresAsRowArray)
@@ -189,42 +227,6 @@ def create_structure(shortcut):
         return Structures.IronMine()
     else:
         return False
-
-
-class Level:
-    mapAsTileRows = []
-    structures = []
-    wood = 0
-    stone = 0
-    iron = 0
-
-    def __init__(self, save_game, map_rows):
-        pos_y = 40
-        pos_x = 100
-        for row in map_rows:
-            pos_y += 40
-            for shortcut_tile in row:
-                pos_x += 40
-                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
-            pos_x = 100
-
-        counter = 0
-        for shortcut_structure_array in save_game:
-            for shortcut_structure in shortcut_structure_array:
-                temp_structure = create_structure(shortcut_structure)
-                self.structures.append(temp_structure)
-                self.mapAsTileRows[counter].set_structure(temp_structure)
-                counter += 1
-
-    def resources_as_string(self):
-        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
-        return resources_str
-
-    def __str__(self):
-        str_names = ""  # type: str
-        for row in self.mapAsTileRows:
-            str_names += row.name + ", "
-        return str_names
 
 
 if __name__ == '__main__':
