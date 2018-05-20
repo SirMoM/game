@@ -18,7 +18,7 @@ class Structure:
 
 
 class LumberJack(Structure):
-    resources_per_loop = 1 / 60
+    resources_per_loop = 1
     shortcut = "LJ"
 
     def __init__(self):
@@ -27,7 +27,7 @@ class LumberJack(Structure):
 
 
 class Quarry(Structure):
-    resources_per_loop = 1 / 120
+    resources_per_loop = 0.5
     shortcut = "Q"
 
     def __init__(self):
@@ -36,7 +36,7 @@ class Quarry(Structure):
 
 
 class IronMine(Structure):
-    resources_per_loop = 1 / 180
+    resources_per_loop = 0.3
     shortcut = "IM"
 
     def __init__(self):

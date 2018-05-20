@@ -41,9 +41,11 @@ class Game:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(Color.grey)
-        self.every_sek = pygame.USEREVENT + 1
+        self.resources_tick = 25
 
     def execute(self):
+        pygame.time.set_timer(self.resources_tick, 1000)
+
         while self.running:
             self.on_event()
 
@@ -53,6 +55,16 @@ class Game:
 
     def on_event(self):
         for event in pygame.event.get():
+
+            if event.type == self.resources_tick:
+                pygame.time.set_timer(self.resources_tick, 1000)
+                for structures in self.level.structures:
+                    if type(structures) is Structures.LumberJack:
+                        self.level.wood += structures.resources_per_loop
+                    elif type(structures) is Structures.Quarry:
+                        self.level.stone += structures.resources_per_loop
+                    elif type(structures) is Structures.IronMine:
+                        self.level.iron += structures.resources_per_loop
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
@@ -74,18 +86,9 @@ class Game:
 
     def on_loop(self):
         # Time
-        pygame.time.set_timer(self.every_sek, 100)
         self.millis = self.clock.tick(self.FPS)
         # self.clock.tick_busy_loop()
         self.playtime += self.millis / 1000
-
-        for struct in self.level.structures:
-            if type(struct) is Structures.LumberJack:
-                self.level.wood += struct.resources_per_loop
-            elif type(struct) is Structures.Quarry:
-                self.level.stone += struct.resources_per_loop
-            elif type(struct) is Structures.IronMine:
-                self.level.iron += struct.resources_per_loop
 
     def render_on_loop(self, level):
         """:type level: Level"""
