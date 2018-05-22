@@ -42,6 +42,34 @@ class TileScreen(tkinter.Frame):
         print("hi there, everyone!")
 
 
+class ColorHex:
+    def __init__(self):
+        print("This is a Utility Class DO NOT create a Object")
+
+    black = "#000000"
+    white = "#FFFFFF"
+    red = "#FF0000"
+    Lime = "#00FF00"
+    blue = "#0000FF"
+    purple = "#800080"
+    grey = "#bbbbbb"
 
 
+def create_label(screen, text, xPos, yPos, bg_color=ColorHex.white, height=1, borderwith=1, relief=None):
+    # "raised"
+    lb = tkinter.Label(screen, text=text)
+    lb["bg"] = bg_color
+    lb["height"] = height
+    lb["width"] = len(lb["text"])
+    lb["borderwidth"] = borderwith
+    lb["relief"] = relief
+    lb.place(x=xPos, y=yPos)
+    return lb
 
+
+def create_button(screen, text, command, xPos, yPos, bg_color=None):
+    button = tkinter.Button(screen, text=text, command=command)
+    button["bg"] = bg_color
+    button["bd"] = 5
+    button.place(x=xPos, y=yPos)
+    return button
