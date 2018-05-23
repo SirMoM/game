@@ -6,24 +6,11 @@ import Screens
 import Tiles
 import Structures
 import pygame
-
+from Utilities import ColorRGB
 from Tiles import Tile
 
 __author__ = "Noah Ruben"
-__version__ = "v1.0"
-
-
-class Color:
-    def __init__(self):
-        print("This is a Utility Class DO NOT create a Object")
-
-    black = (0, 0, 0)
-    white = (255, 255, 255)
-    red = (255, 0, 0)
-    green = (0, 255, 0)
-    blue = (0, 0, 255)
-    purple = (150, 43, 186)
-    grey = (150, 150, 150)
+__version__ = "0.0"
 
 
 class Game:
@@ -41,7 +28,7 @@ class Game:
         self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((500, 500))
-        self.screen.fill(Color.grey)
+        self.screen.fill(ColorRGB.grey)
         self.resources_tick = 25
 
     def execute(self):
@@ -90,7 +77,7 @@ class Game:
     def render_on_loop(self, level):
         """:type level: Level"""
 
-        self.screen.fill(Color.grey)
+        self.screen.fill(ColorRGB.grey)
         str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
 
@@ -125,7 +112,7 @@ class Game:
             self.screen.blit(text_surface, (52, 74))
 
     def create_tile_screen(self):
-        tile_screen = pygame.display.set_mode((200, 400))
+        """TODO show the Title Scree either as an separate window or in the same"""
 
 
 class Level:
@@ -227,12 +214,3 @@ def create_structure(shortcut):
         return Structures.IronMine()
     else:
         return False
-
-
-if __name__ == '__main__':
-    map1 = "level.map"
-    map2 = "level2.map"
-    game = Game()
-    lp = LevelParser("save_game.json")
-    game.level = lp.get_level()
-    game.execute()
