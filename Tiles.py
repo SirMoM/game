@@ -1,5 +1,7 @@
 import pygame
 
+import Structures
+
 
 class Tile:
     name = None
@@ -23,11 +25,11 @@ class Tile:
             self.tile_pos[1]) + " Structure: " + self.structure.__str__()
         return out_str
 
-    def set_structure(self, structure):
+    def set_structure(self, structure: Structures.Structure):
         self.has_structure = True
         self.structure = structure
 
-    def get_structure(self):
+    def get_structure(self) -> Structures:
         return self.structure
 
     def get_rect(self):

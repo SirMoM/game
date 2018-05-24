@@ -1,10 +1,15 @@
+import Structures
+import Tiles
 import tkinter
+
 from Utilities import ColorHex
 
 
 class TileScreen(tkinter.Frame):
 
-    def __init__(self, tile):
+    def __init__(self, tile: Tiles.Tile):
+        self.tile = tile
+        self.is_active = True
         self.root = tkinter.Tk()
         print("New TileScreen")
         self.root.title(tile.name)
@@ -12,11 +17,26 @@ class TileScreen(tkinter.Frame):
         super().__init__(self.root)
         self.pack()
         self.close_button = create_button(self.root, "X", self.close, 275, 0, bg_color=ColorHex.red)
-        self.is_active = True
+
+        self.create_things()
+
+    def create_things(self):
+        if self.tile.get_structure():
+            structure_str = "Structure: " + self.tile.get_structure().name
+            resource_str = "Resources: " + str(
+                self.tile.get_structure().resources_per_loop) + " " + self.tile.get_structure().resources_type + " per second"
+            create_label(self.root, structure_str, 10, 100)
+            create_label(self.root, resource_str, 10, 200)
+        else:
+            create_button(self.root, "Construction", self.construction, 10, 300)
 
     def close(self):
         self.is_active = False
         self.root.destroy()
+
+    def construction(self):
+        self.tile.set_structure(Structures.LumberJack())
+        self.create_things()
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, bg_color=ColorHex.white, height=1, borderwith=1,
