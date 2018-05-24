@@ -3,14 +3,20 @@ from Utilities import ColorHex
 
 
 class TileScreen(tkinter.Frame):
-    root = tkinter.Tk()
 
     def __init__(self, tile):
+        self.root = tkinter.Tk()
         print("New TileScreen")
         self.root.title(tile.name)
         self.root.geometry("300x400")
         super().__init__(self.root)
         self.pack()
+        self.close_button = create_button(self.root, "X", self.close, 275, 0, bg_color=ColorHex.red)
+        self.is_active = True
+
+    def close(self):
+        self.is_active = False
+        self.root.destroy()
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, bg_color=ColorHex.white, height=1, borderwith=1,

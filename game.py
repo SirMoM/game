@@ -17,6 +17,7 @@ class Game:
     running = False
     FPS = 60
     level = None
+    windows = []
 
     def __init__(self):
         self.millis = 0
@@ -61,6 +62,7 @@ class Game:
                 for tile in self.level.mapAsTileRows:
                     if tile.is_point_in_tile(xPos, yPos):
                         tile_screen = Screens.TileScreen(tile)
+                        self.windows.append(tile_screen)
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -80,6 +82,12 @@ class Game:
         self.screen.fill(ColorRGB.grey)
         str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
+
+        for window in self.windows:
+            if window.is_active:
+                window.update()
+            else:
+                self.windows.remove(window)
 
         self.render_reassures_bar()
 
@@ -110,9 +118,6 @@ class Game:
             str_anz_iron = ": %.f" % self.level.iron
             text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
-
-    def create_tile_screen(self):
-        """TODO show the Title Scree either as an separate window or in the same"""
 
 
 class Level:
@@ -159,7 +164,7 @@ class LevelParser:
     structuresVar = "structures"
     seasonVar = "season"
 
-    def __init__(self, save_game_path):
+    def __init__(self, save_game_path: str):
         self.structuresAsRowArray = []
         self.mapAsRowArray = []
 
@@ -167,16 +172,16 @@ class LevelParser:
 
         save_game_as_string = self.saveGame.read()
 
-        save_game_as_json_objekt = json.loads(save_game_as_string)
+        save_game_as_json_object = json.loads(save_game_as_string)
 
-        print("Miscellaneous: ", save_game_as_json_objekt[self.mapVar][self.miscVar])
-        print("Season: ", save_game_as_json_objekt[self.mapVar][self.seasonVar])
+        print("Miscellaneous: ", save_game_as_json_object[self.mapVar][self.miscVar])
+        print("Season: ", save_game_as_json_object[self.mapVar][self.seasonVar])
 
-        for rows in save_game_as_json_objekt[self.mapVar][self.terrainVar]:
+        for rows in save_game_as_json_object[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
 
-        if self.structuresVar in save_game_as_json_objekt:
-            for r in save_game_as_json_objekt[self.structuresVar]:
+        if self.structuresVar in save_game_as_json_object:
+            for r in save_game_as_json_object[self.structuresVar]:
                 self.structuresAsRowArray.append(r["row"])
 
         print("structuresAsRowArray: ", self.structuresAsRowArray)
@@ -187,7 +192,7 @@ class LevelParser:
         return self.level
 
 
-def create_tile(shortcut, pos):
+def create_tile(shortcut: str, pos: tuple):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
         return Tiles.NormalTile(pos)
@@ -204,7 +209,7 @@ def create_tile(shortcut, pos):
         return Tiles.NormalTile(pos)
 
 
-def create_structure(shortcut):
+def create_structure(shortcut: str):
     # type: () -> Structures
     if shortcut == Structures.LumberJack.shortcut:
         return Structures.LumberJack()
