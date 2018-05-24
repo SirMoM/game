@@ -1,14 +1,14 @@
 import Structures
 import Tiles
 import tkinter
-
 from Utilities import ColorHex
 
 
 class TileScreen(tkinter.Frame):
 
-    def __init__(self, tile: Tiles.Tile):
+    def __init__(self, level, tile: Tiles.Tile):
         self.tile = tile
+        self.level = level
         self.is_active = True
         self.root = tkinter.Tk()
         print("New TileScreen")
@@ -35,7 +35,9 @@ class TileScreen(tkinter.Frame):
         self.root.destroy()
 
     def construction(self):
-        self.tile.set_structure(Structures.LumberJack())
+        tempStructure = Structures.LumberJack()
+        self.tile.set_structure(tempStructure)
+        self.level.structures.append(tempStructure)
         self.create_things()
 
 

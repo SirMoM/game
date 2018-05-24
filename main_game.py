@@ -7,10 +7,45 @@ import Tiles
 import Structures
 import pygame
 from Utilities import ColorRGB
-from Tiles import Tile
 
 __author__ = "Noah Ruben"
-__version__ = "0.0"
+__version__ = "0.1"
+
+
+class Level(object):
+    mapAsTileRows = []
+    structures = []
+    wood = 0
+    stone = 0
+    iron = 0
+
+    def __init__(self, save_game, map_rows):
+        pos_y = 40
+        pos_x = 100
+        for row in map_rows:
+            pos_y += 40
+            for shortcut_tile in row:
+                pos_x += 40
+                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
+            pos_x = 100
+
+        counter = 0
+        for shortcut_structure_array in save_game:
+            for shortcut_structure in shortcut_structure_array:
+                temp_structure = create_structure(shortcut_structure)
+                self.structures.append(temp_structure)
+                self.mapAsTileRows[counter].set_structure(temp_structure)
+                counter += 1
+
+    def resources_as_string(self):
+        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
+        return resources_str
+
+    def __str__(self):
+        str_names = ""  # type: str
+        for row in self.mapAsTileRows:
+            str_names += row.name + ", "
+        return str_names
 
 
 class Game:
@@ -61,7 +96,7 @@ class Game:
                 print("Click: ", xPos, yPos)
                 for tile in self.level.mapAsTileRows:
                     if tile.is_point_in_tile(xPos, yPos):
-                        tile_screen = Screens.TileScreen(tile)
+                        tile_screen = Screens.TileScreen(self.level, tile)
                         self.windows.append(tile_screen)
 
             # quit if the quit button was pressed
@@ -76,7 +111,7 @@ class Game:
         # self.clock.tick_busy_loop()
         self.playtime += self.millis / 1000
 
-    def render_on_loop(self, level):
+    def render_on_loop(self, level: Level):
         """:type level: Level"""
 
         self.screen.fill(ColorRGB.grey)
@@ -120,42 +155,6 @@ class Game:
             self.screen.blit(text_surface, (52, 74))
 
 
-class Level:
-    mapAsTileRows = []
-    structures = []
-    wood = 0
-    stone = 0
-    iron = 0
-
-    def __init__(self, save_game, map_rows):
-        pos_y = 40
-        pos_x = 100
-        for row in map_rows:
-            pos_y += 40
-            for shortcut_tile in row:
-                pos_x += 40
-                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
-            pos_x = 100
-
-        counter = 0
-        for shortcut_structure_array in save_game:
-            for shortcut_structure in shortcut_structure_array:
-                temp_structure = create_structure(shortcut_structure)
-                self.structures.append(temp_structure)
-                self.mapAsTileRows[counter].set_structure(temp_structure)
-                counter += 1
-
-    def resources_as_string(self):
-        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
-        return resources_str
-
-    def __str__(self):
-        str_names = ""  # type: str
-        for row in self.mapAsTileRows:
-            str_names += row.name + ", "
-        return str_names
-
-
 class LevelParser:
     mapVar = "map"
     terrainVar = "terrain"
@@ -188,7 +187,7 @@ class LevelParser:
 
         self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
 
-    def get_level(self):
+    def get_level(self) -> Level:
         return self.level
 
 
