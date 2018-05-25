@@ -63,6 +63,19 @@ class TileScreen(tkinter.Frame):
         self.create_things()
 
 
+class InGameMenu(tkinter.Frame):
+    def __init__(self) -> tkinter.Frame:
+        self.root = tkinter.Tk()
+        self.root.title("Menu")
+        self.root.geometry("300x400+100+100")
+        self.root.protocol("WM_DELETE_WINDOW", self.close)
+        super().__init__(self.root)
+        self.pack()
+
+    def close(self):
+        self.root.destroy()
+
+
 def create_label(screen, text: str, xPos: int, yPos: int, bg_color=ColorHex.white, height=1, borderwith=1,
                  relief=None) -> tkinter.Label:
     """
