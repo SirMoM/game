@@ -17,24 +17,6 @@ class Level(object):
     stone = 0
     iron = 0
 
-    def __init__(self, save_game, map_rows):
-        pos_y = 40
-        pos_x = 100
-        for row in map_rows:
-            pos_y += 40
-            for shortcut_tile in row:
-                pos_x += 40
-                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
-            pos_x = 100
-
-        counter = 0
-        for shortcut_structure_array in save_game:
-            for shortcut_structure in shortcut_structure_array:
-                temp_structure = create_structure(shortcut_structure)
-                self.structures.append(temp_structure)
-                self.mapAsTileRows[counter].set_structure(temp_structure)
-                counter += 1
-
     def resources_as_string(self):
         resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
         return resources_str
@@ -77,7 +59,6 @@ class Game:
 
     def on_event(self):
         for event in pygame.event.get():
-
             if event.type == self.resources_tick:
                 pygame.time.set_timer(self.resources_tick, 1000)
                 for structures in self.level.structures:
@@ -92,10 +73,16 @@ class Game:
                 xPos, yPos = pygame.mouse.get_pos()
 
                 print("Click: ", xPos, yPos)
-                for tile in self.level.mapAsTileRows:
-                    if tile.is_point_in_tile(xPos, yPos):
-                        tile_screen = Screens.TileScreen(self.level, tile)
-                        self.windows.append(tile_screen)
+                for row in self.level.mapAsTileRows:
+                    for tile in row:
+                        if tile.is_point_in_tile(xPos, yPos):
+                            tile_screen = Screens.TileScreen(self.level, tile)
+                            self.windows.append(tile_screen)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    this = self
+                    self.windows.append(Screens.InGameMenu(this))
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -106,7 +93,6 @@ class Game:
     def on_loop(self):
         # Time
         self.millis = self.clock.tick(self.FPS)
-        # self.clock.tick_busy_loop()
         self.playtime += self.millis / 1000
 
     def render_on_loop(self, level: Level):
@@ -120,17 +106,18 @@ class Game:
             if window.is_active:
                 window.update()
             else:
+                # if type(window) is Screens.InGameMenu:
                 self.windows.remove(window)
 
         self.render_reassures_bar()
 
-        for tile in level.mapAsTileRows:
-            self.screen.blit(tile.bg_img, tile.tile_pos)
+        for row in level.mapAsTileRows:
+            for tile in row:
+                self.screen.blit(tile.bg_img, tile.tile_pos)
 
-            # Draw ggf. structures
-            if tile.structure:
-                self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
-
+                # Draw ggf. structures
+                if tile.structure is not None:
+                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
         pygame.display.flip()
 
     def render_reassures_bar(self):
@@ -169,9 +156,9 @@ class LevelParser:
         self.structuresAsRowArray = []
         self.mapAsRowArray = []
 
-        self.saveGame = open(save_game_path, "r")
+        self.save_game_file = open(save_game_path, "r")
 
-        save_game_as_string = self.saveGame.read()
+        save_game_as_string = self.save_game_file.read()
 
         save_game_as_json_object = json.loads(save_game_as_string)
 
@@ -186,31 +173,121 @@ class LevelParser:
             for r in save_game_as_json_object[self.structuresVar]:
                 self.structuresAsRowArray.append(r["row"])
 
-        print("structuresAsRowArray: ", self.structuresAsRowArray)
+        self.level = Level()
 
-        self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
+        pos_y = 40
+        pos_x = 100
+
+        for row_index in range(0, self.mapAsRowArray.__len__()):
+            pos_y += 40
+            temp_array = []
+            temp_array.clear()
+            for tile_shortcut_index in range(0, self.mapAsRowArray[row_index].__len__()):
+                pos_x += 40
+                if self.structuresAsRowArray:
+                    temp_structure = create_structure(self.structuresAsRowArray[row_index][tile_shortcut_index])
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                                                  structure=temp_structure))
+                    self.level.structures.append(temp_structure)
+                else:
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y)))
+
+            pos_x = 100
+            self.level.mapAsTileRows.append(temp_array)
 
         # set the level resources
         self.level.wood = save_game_as_json_object[self.resourcesVar][self.woodVar]
         self.level.stone = save_game_as_json_object[self.resourcesVar][self.stoneVar]
         self.level.iron = save_game_as_json_object[self.resourcesVar][self.ironVar]
 
+        self.save_game_file.close()
+
     def get_level(self) -> Level:
         return self.level
 
 
-def create_tile(shortcut: str, pos: tuple):
+class LevelWriter(object):
+    mapVar = "map"
+    terrainVar = "terrain"
+    rowVar = "row"
+    miscVar = "misc"
+    structuresVar = "structures"
+    seasonVar = "season"
+    resourcesVar = "resources"
+    woodVar = "wood"
+    stoneVar = "stone"
+    ironVar = "iron"
+
+    def __init__(self, filename: str, level: Level):
+        self.filename = filename
+        self.level = level
+        self.save_game_path = "saves/" + filename + ".json"
+        self.save_game_file = open(self.save_game_path, "w")
+
+        level_as_json_string = '{' \
+                               '"' + self.structuresVar + '": [],' \
+                                                          '"' + self.mapVar + '": {' \
+                                                                              '"' + self.terrainVar + '": [],' \
+                                                                                                      '"' + self.miscVar + '": "None",' \
+                                                                                                                           '"' + self.seasonVar + '": "Summer"},' \
+                                                                                                                                                  '"' + self.resourcesVar + '": {' \
+                                                                                                                                                                            '"' + self.woodVar + '": 0,' \
+                                                                                                                                                                                                 '"' + self.stoneVar + '": 0,' \
+                                                                                                                                                                                                                       '"' + self.ironVar + '": 0}' \
+                                                                                                                                                                                                                                            '}'
+        json_obj = json.loads(level_as_json_string)
+
+
+        for row in self.level.mapAsTileRows:
+            temp_tile_shortcut_array = []
+            temp_structures_shortcut_array = []
+            temp_tile_shortcut_array.clear()
+            temp_structures_shortcut_array.clear()
+            for tile in row:
+                temp_tile_shortcut_array.append(tile.shortcut)
+                if tile.structure:
+                    temp_structures_shortcut_array.append(tile.structure.shortcut)
+                else:
+                    temp_structures_shortcut_array.append("N")
+
+            json_obj[self.mapVar][self.terrainVar].append(self.create_row(temp_tile_shortcut_array))
+            json_obj[self.structuresVar].append(self.create_row(temp_structures_shortcut_array))
+
+        json_obj[self.resourcesVar][self.woodVar] = self.level.wood
+        json_obj[self.resourcesVar][self.stoneVar] = self.level.stone
+        json_obj[self.resourcesVar][self.ironVar] = self.level.iron
+
+        json.dump(json_obj, self.save_game_file)
+        self.save_game_file.close()
+
+    def create_row(self, row_inhalt):
+        row_json_object = json.loads('{"row" : []}')
+        row_json_object[self.rowVar] = row_inhalt
+        return row_json_object
+
+
+def create_tile(shortcut: str, pos: tuple, structure: Structures.Structure = None):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
-        return Tiles.NormalTile(pos)
+        temp = Tiles.NormalTile(pos)
+        temp.set_structure(structure)
+        return temp
     elif shortcut == Tiles.ForestTile.shortcut:
-        return Tiles.ForestTile(pos)
+        temp = Tiles.ForestTile(pos)
+        temp.set_structure(structure)
+        return temp
     elif shortcut == Tiles.MineTile.shortcut:
-        return Tiles.MineTile(pos)
+        temp = Tiles.MineTile(pos)
+        temp.set_structure(structure)
+        return temp
     elif shortcut == Tiles.LakeTile.shortcut:
-        return Tiles.LakeTile(pos)
+        temp = Tiles.LakeTile(pos)
+        temp.set_structure(structure)
+        return temp
     elif shortcut == Tiles.MountainTile.shortcut:
-        return Tiles.MountainTile(pos)
+        temp = Tiles.MountainTile(pos)
+        temp.set_structure(structure)
+        return temp
     else:
         print("There went something wrong for creating the Tile")
         return Tiles.NormalTile(pos)
@@ -225,4 +302,4 @@ def create_structure(shortcut: str):
     elif shortcut == Structures.IronMine.shortcut:
         return Structures.IronMine()
     else:
-        return False
+        return None

@@ -10,7 +10,7 @@ class Tile:
     tile_pos = None
     associated_structure_pos = None
     has_structure = False
-    structure = None
+    structure = False
     shortcut = "D"
     rect = None
 
