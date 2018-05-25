@@ -203,6 +203,13 @@ class LevelParser:
         return self.level
 
 
+class LevelWriter(object):
+
+    def __init__(self, filename: str, level: Level):
+        self.filename = filename
+        self.level = level
+
+
 def create_tile(shortcut: str, pos: tuple):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
