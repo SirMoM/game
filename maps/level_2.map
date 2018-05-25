@@ -50,6 +50,11 @@
     ],
     "misc": "None",
     "season": "Summer"
+  },
+  "resources": {
+    "wood": 10,
+    "stone": 10,
+    "iron": 10
   }
 }
 

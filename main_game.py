@@ -162,6 +162,10 @@ class LevelParser:
     miscVar = "misc"
     structuresVar = "structures"
     seasonVar = "season"
+    resourcesVar = "resources"
+    woodVar = "wood"
+    stoneVar = "stone"
+    ironVar = "iron"
 
     def __init__(self, save_game_path: str):
         self.structuresAsRowArray = []
@@ -175,6 +179,7 @@ class LevelParser:
 
         print("Miscellaneous: ", save_game_as_json_object[self.mapVar][self.miscVar])
         print("Season: ", save_game_as_json_object[self.mapVar][self.seasonVar])
+        print("Resources: ", save_game_as_json_object[self.resourcesVar])
 
         for rows in save_game_as_json_object[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
@@ -186,6 +191,11 @@ class LevelParser:
         print("structuresAsRowArray: ", self.structuresAsRowArray)
 
         self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
+
+        # set the level resources
+        self.level.wood = save_game_as_json_object[self.resourcesVar][self.woodVar]
+        self.level.stone = save_game_as_json_object[self.resourcesVar][self.stoneVar]
+        self.level.iron = save_game_as_json_object[self.resourcesVar][self.ironVar]
 
     def get_level(self) -> Level:
         return self.level

@@ -119,5 +119,11 @@
     ],
     "misc": "None",
     "season": "Summer"
+  },
+  "resources": {
+    "wood": 11,
+    "stone": 1.5,
+    "iron": 4.3
   }
+
 }
