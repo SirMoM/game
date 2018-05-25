@@ -77,7 +77,6 @@ class Game:
 
     def on_event(self):
         for event in pygame.event.get():
-
             if event.type == self.resources_tick:
                 pygame.time.set_timer(self.resources_tick, 1000)
                 for structures in self.level.structures:
@@ -97,6 +96,11 @@ class Game:
                         tile_screen = Screens.TileScreen(self.level, tile)
                         self.windows.append(tile_screen)
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    this = self
+                    self.windows.append(Screens.InGameMenu(this))
+
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
                 self.running = True
@@ -106,7 +110,6 @@ class Game:
     def on_loop(self):
         # Time
         self.millis = self.clock.tick(self.FPS)
-        # self.clock.tick_busy_loop()
         self.playtime += self.millis / 1000
 
     def render_on_loop(self, level: Level):
@@ -120,6 +123,7 @@ class Game:
             if window.is_active:
                 window.update()
             else:
+                # if type(window) is Screens.InGameMenu:
                 self.windows.remove(window)
 
         self.render_reassures_bar()

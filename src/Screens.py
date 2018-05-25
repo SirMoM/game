@@ -1,4 +1,4 @@
-from src import Tiles, Structures
+from src import Tiles, Structures, main_game
 import tkinter
 from src.Utilities import ColorHex
 
@@ -64,7 +64,10 @@ class TileScreen(tkinter.Frame):
 
 
 class InGameMenu(tkinter.Frame):
-    def __init__(self) -> tkinter.Frame:
+    def __init__(self, game: main_game.Game) -> tkinter.Frame:
+        self.game = game
+        self.is_active = True
+
         self.root = tkinter.Tk()
         self.root.title("Menu")
         self.root.geometry("300x400+100+100")
@@ -72,7 +75,26 @@ class InGameMenu(tkinter.Frame):
         super().__init__(self.root)
         self.pack()
 
+        self.make_widgets()
+
+    def make_widgets(self):
+        create_button(self.root, "Resume game", self.close, 100, 100)
+        create_button(self.root, "Options", self.options, 100, 150)
+        create_button(self.root, "Save Game", self.save_level, 100, 200)
+        create_button(self.root, "Close game", self.close_game, 100, 250)
+
+    def save_level(self):
+        pass
+
+    def close_game(self):
+        self.game.running = False
+
+    def options(self):
+        self.close()
+        # TODO open the Options Screen
+
     def close(self):
+        self.is_active = False
         self.root.destroy()
 
 
