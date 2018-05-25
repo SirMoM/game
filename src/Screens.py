@@ -1,7 +1,6 @@
-import Structures
-import Tiles
+from src import Tiles, Structures
 import tkinter
-from Utilities import ColorHex
+from src.Utilities import ColorHex
 
 
 class TileScreen(tkinter.Frame):

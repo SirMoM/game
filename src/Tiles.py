@@ -1,6 +1,6 @@
 import pygame
 
-import Structures
+from src import Structures
 
 
 class Tile:

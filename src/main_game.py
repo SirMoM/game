@@ -2,11 +2,9 @@
 import sys
 import json
 
-import Screens
-import Tiles
-import Structures
+from src import Screens, Tiles, Structures
 import pygame
-from Utilities import ColorRGB
+from src.Utilities import ColorRGB
 
 __author__ = "Noah Ruben"
 __version__ = "0.1"
