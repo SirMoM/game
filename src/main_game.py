@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import json
+from typing import List
 
 from src import Screens, Tiles, Structures
 import pygame
@@ -20,12 +21,14 @@ class Level(object):
     def __init__(self, save_game, map_rows):
         pos_y = 40
         pos_x = 100
+        temp = []
         for row in map_rows:
             pos_y += 40
             for shortcut_tile in row:
                 pos_x += 40
-                self.mapAsTileRows.append(create_tile(shortcut_tile, (pos_x, pos_y)))
+                temp.append(create_tile(shortcut_tile, (pos_x, pos_y)))
             pos_x = 100
+            self.mapAsTileRows.append(temp)
 
         counter = 0
         for shortcut_structure_array in save_game:
@@ -204,10 +207,56 @@ class LevelParser:
 
 
 class LevelWriter(object):
+    mapVar = "map"
+    terrainVar = "terrain"
+    rowVar = "row"
+    miscVar = "misc"
+    structuresVar = "structures"
+    seasonVar = "season"
+    resourcesVar = "resources"
+    woodVar = "wood"
+    stoneVar = "stone"
+    ironVar = "iron"
 
     def __init__(self, filename: str, level: Level):
         self.filename = filename
         self.level = level
+        self.save_game_path = "saves/" + filename + ".json"
+        self.saveGame = open(self.save_game_path, "w")
+
+        row_json_object = json.loads('{"row" : []}')
+
+        level_as_json_string = '{' \
+                               '"' + self.structuresVar + '": [],' \
+                                                          '"' + self.mapVar + '": {' \
+                                                                              '"' + self.terrainVar + '": [],' \
+                                                                                                      '"' + self.miscVar + '": "None",' \
+                                                                                                                           '"' + self.seasonVar + '": "Summer"},' \
+                                                                                                                                                  '"' + self.resourcesVar + '": {' \
+                                                                                                                                                                            '"' + self.woodVar + '": 0,' \
+                                                                                                                                                                                                 '"' + self.stoneVar + '": 0,' \
+                                                                                                                                                                                                                       '"' + self.ironVar + '": 0}' \
+                                                                                                                                                                                                                                            '}'
+        json_obj = json.loads(level_as_json_string)
+
+        print(self.level.mapAsTileRows)
+
+        for row in self.level.mapAsTileRows:
+            print(row)
+            temp = []
+            temp.clear()
+            for tiles in row:
+                temp.append(tiles.shortcut)
+            json_obj[self.mapVar][self.terrainVar].append(self.create_row(temp))
+
+        print()
+
+        json.dump(json_obj, self.saveGame)
+
+    def create_row(self, row_inhalt):
+        row_json_object = json.loads('{"row" : []}')
+        row_json_object[self.rowVar] = row_inhalt
+        return row_json_object
 
 
 def create_tile(shortcut: str, pos: tuple):
