@@ -44,7 +44,7 @@ class TileScreen(tkinter.Frame):
         tempStructure = Structures.LumberJack()
 
         previous_structure = self.tile.get_structure()
-        if previous_structure is not None:
+        if previous_structure is not None and previous_structure in self.level.structures:
             self.level.structures.remove(previous_structure)
 
         self.tile.set_structure(tempStructure)
@@ -55,7 +55,7 @@ class TileScreen(tkinter.Frame):
         tempStructure = Structures.IronMine()
 
         previous_structure = self.tile.get_structure()
-        if previous_structure is not None:
+        if previous_structure is not None and previous_structure in self.level.structures:
             self.level.structures.remove(previous_structure)
 
         self.tile.set_structure(tempStructure)
@@ -64,7 +64,7 @@ class TileScreen(tkinter.Frame):
 
 
 class InGameMenu(tkinter.Frame):
-    def __init__(self, game: main_game.Game) -> tkinter.Frame:
+    def __init__(self, game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
 
@@ -103,7 +103,7 @@ class InGameMenu(tkinter.Frame):
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
 
-    def __init__(self, game: main_game.Game) -> tkinter.Frame:
+    def __init__(self, game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
         self.input_textfield: Textfield = None
@@ -134,7 +134,9 @@ class SaveMenu(tkinter.Frame):
                 input_is_valid = False
 
         if input_is_valid:
-            main_game.LevelWriter(user_input)
+            main_game.LevelWriter(user_input, self.game.level)
+            create_label(self.root, 'Saved', 0, 25, height=2)
+            self.close()
 
     def close(self):
         self.is_active = False
