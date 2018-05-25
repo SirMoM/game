@@ -24,7 +24,7 @@ class TileScreen(tkinter.Frame):
 
     def create_things(self):
         self.tile_img = Image(self.root, self.tile.img_path)
-        self.tile_img.create_image(50, 0, 200, 200, 32)
+        self.tile_img.create_image(50, 0, 200, 200)
 
         if self.tile.get_structure():
             structure_str = "Structure: " + self.tile.get_structure().name

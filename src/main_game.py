@@ -18,26 +18,6 @@ class Level(object):
     stone = 0
     iron = 0
 
-    def __init__(self, save_game, map_rows):
-        pos_y = 40
-        pos_x = 100
-        temp = []
-        for row in map_rows:
-            pos_y += 40
-            for shortcut_tile in row:
-                pos_x += 40
-                temp.append(create_tile(shortcut_tile, (pos_x, pos_y)))
-            pos_x = 100
-            self.mapAsTileRows.append(temp)
-
-        counter = 0
-        for shortcut_structure_array in save_game:
-            for shortcut_structure in shortcut_structure_array:
-                temp_structure = create_structure(shortcut_structure)
-                self.structures.append(temp_structure)
-                self.mapAsTileRows[counter].set_structure(temp_structure)
-                counter += 1
-
     def resources_as_string(self):
         resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
         return resources_str
@@ -94,10 +74,11 @@ class Game:
                 xPos, yPos = pygame.mouse.get_pos()
 
                 print("Click: ", xPos, yPos)
-                for tile in self.level.mapAsTileRows:
-                    if tile.is_point_in_tile(xPos, yPos):
-                        tile_screen = Screens.TileScreen(self.level, tile)
-                        self.windows.append(tile_screen)
+                for row in self.level.mapAsTileRows:
+                    for tile in row:
+                        if tile.is_point_in_tile(xPos, yPos):
+                            tile_screen = Screens.TileScreen(self.level, tile)
+                            self.windows.append(tile_screen)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -131,13 +112,13 @@ class Game:
 
         self.render_reassures_bar()
 
-        for tile in level.mapAsTileRows:
-            self.screen.blit(tile.bg_img, tile.tile_pos)
+        for row in level.mapAsTileRows:
+            for tile in row:
+                self.screen.blit(tile.bg_img, tile.tile_pos)
 
-            # Draw ggf. structures
-            if tile.structure:
-                self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
-
+                # Draw ggf. structures
+                if tile.structure:
+                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
         pygame.display.flip()
 
     def render_reassures_bar(self):
@@ -188,14 +169,39 @@ class LevelParser:
 
         for rows in save_game_as_json_object[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
+        print("mapAsRowArray: ", self.mapAsRowArray)
 
         if self.structuresVar in save_game_as_json_object:
             for r in save_game_as_json_object[self.structuresVar]:
                 self.structuresAsRowArray.append(r["row"])
-
         print("structuresAsRowArray: ", self.structuresAsRowArray)
 
-        self.level = Level(self.structuresAsRowArray, self.mapAsRowArray)
+        self.level = Level()
+
+        pos_y = 40
+        pos_x = 100
+
+        for row_index in range(0, self.mapAsRowArray.__len__()):
+            pos_y += 40
+            temp_array = []
+            temp_array.clear()
+            for tile_shortcut_index in range(0, self.mapAsRowArray[row_index].__len__()):
+                pos_x += 40
+                temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                                              structure=create_structure(
+                                                  self.structuresAsRowArray[row_index][tile_shortcut_index])))
+            pos_x = 100
+            self.level.mapAsTileRows.append(temp_array)
+
+        rowCounter = 0
+        tileCounter = 0
+        for row in self.structuresAsRowArray:
+            rowCounter += 1
+            for shortcut_structure in row:
+                temp_structure = create_structure(shortcut_structure)
+                self.level.structures.append(temp_structure)
+                # self.level.mapAsTileRows[rowCounter][tileCounter].set_structure(temp_structure)
+                tileCounter += 1
 
         # set the level resources
         self.level.wood = save_game_as_json_object[self.resourcesVar][self.woodVar]
@@ -259,12 +265,14 @@ class LevelWriter(object):
         return row_json_object
 
 
-def create_tile(shortcut: str, pos: tuple):
+def create_tile(shortcut: str, pos: tuple, structure: Structures.Structure = None):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
         return Tiles.NormalTile(pos)
     elif shortcut == Tiles.ForestTile.shortcut:
-        return Tiles.ForestTile(pos)
+        temp = Tiles.ForestTile(pos)
+        temp.set_structure(structure)
+        return temp
     elif shortcut == Tiles.MineTile.shortcut:
         return Tiles.MineTile(pos)
     elif shortcut == Tiles.LakeTile.shortcut:
