@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 import json
 
@@ -9,6 +10,7 @@ from src.Utilities import ColorRGB
 __author__ = "Noah Ruben"
 __version__ = "0.1"
 
+parent_dir = os.path.dirname(os.getcwd())
 
 class Level(object):
     mapAsTileRows = []
@@ -122,19 +124,19 @@ class Game:
 
     def render_reassures_bar(self):
         if self.level.wood >= 1:
-            self.screen.blit(pygame.image.load("textures/resources/wood.png"), (10, 10))
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
             str_anz_wood = ": %.f" % self.level.wood
             text_surface = self.my_font.render(str_anz_wood, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 5))
 
         if self.level.stone >= 1:
-            self.screen.blit(pygame.image.load("textures/resources/stone2.png"), (10, 42))
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
             str_anz_stone = ": %.f" % self.level.stone
             text_surface = self.my_font.render(str_anz_stone, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 42))
 
         if self.level.iron >= 1:
-            self.screen.blit(pygame.image.load("textures/resources/iron.png"), (10, 74))
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/iron.png")), (10, 74))
             str_anz_iron = ": %.f" % self.level.iron
             text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
@@ -156,7 +158,7 @@ class LevelParser:
         self.structuresAsRowArray = []
         self.mapAsRowArray = []
 
-        self.save_game_file = open(save_game_path, "r")
+        self.save_game_file = open(os.path.join(parent_dir, save_game_path), "r")
 
         save_game_as_string = self.save_game_file.read()
 

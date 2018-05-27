@@ -1,6 +1,10 @@
+import os
+
 import pygame
 
 from src import Structures
+
+parent_dir = os.path.dirname(os.getcwd())
 
 
 class Tile:
@@ -52,7 +56,7 @@ class Tile:
 class NormalTile(Tile):
     shortcut = "N"
     name = "Normal Ground"
-    img_path = "textures/tiles/normTile.png"
+    img_path = os.path.join(parent_dir, "textures/tiles/normTile.png")
 
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -63,7 +67,7 @@ class NormalTile(Tile):
 class ForestTile(Tile):
     shortcut = "F"
     name = "Forrest"
-    img_path = "textures/tiles/forestTile.png"
+    img_path = os.path.join(parent_dir, "textures/tiles/forestTile.png")
 
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -74,7 +78,7 @@ class ForestTile(Tile):
 class MineTile(Tile):
     shortcut = "PM"  # Potential Mine
     name = "Mine"
-    img_path = "textures/tiles/mineTile.png"
+    img_path = os.path.join(parent_dir, "textures/tiles/mineTile.png")
 
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -85,7 +89,7 @@ class MineTile(Tile):
 class LakeTile(Tile):
     shortcut = "L"
     name = "Lake"
-    img_path = "textures/tiles/lakeTile.png"
+    img_path = os.path.join(parent_dir, "textures/tiles/lakeTile.png")
 
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -96,7 +100,7 @@ class LakeTile(Tile):
 class MountainTile(Tile):
     shortcut = "M"
     name = "Mountain"
-    img_path = "textures/tiles/mountainTile.png"
+    img_path = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
 
     def __init__(self, tile_pos):
         self.bg_img = pygame.image.load(self.img_path)

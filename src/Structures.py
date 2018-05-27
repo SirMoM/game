@@ -1,4 +1,8 @@
+import os
+
 import pygame
+
+parent_dir = os.path.dirname(os.getcwd())
 
 
 class Structure:
@@ -24,7 +28,7 @@ class LumberJack(Structure):
     name = "Lumber Jack"
 
     def __init__(self):
-        self.structure_img = pygame.image.load("textures\structures\lumberJack.png")
+        self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures\structures\lumberJack.png"))
 
 
 class Quarry(Structure):
@@ -34,7 +38,7 @@ class Quarry(Structure):
     name = "Quarry"
 
     def __init__(self):
-        self.structure_img = pygame.image.load("textures/structures/quarry.png")
+        self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/quarry.png"))
 
 
 class IronMine(Structure):
@@ -44,4 +48,4 @@ class IronMine(Structure):
     name = "Iron Mine"
 
     def __init__(self):
-        self.structure_img = pygame.image.load("textures/structures/ironMine.png")
+        self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
