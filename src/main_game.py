@@ -12,7 +12,8 @@ __version__ = "0.1"
 
 parent_dir = os.path.dirname(os.getcwd())
 
-class Level(object):
+
+class Level:
     mapAsTileRows = []
     structures = []
     wood = 0
@@ -88,7 +89,7 @@ class Game:
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
-                self.running = True
+                self.running = False
                 pygame.quit()
                 sys.exit()
 
@@ -224,7 +225,8 @@ class LevelWriter(object):
         self.filename = filename
         self.level = level
         self.save_game_path = "saves/" + filename + ".json"
-        self.save_game_file = open(self.save_game_path, "w")
+        #TODO FIX
+        self.save_game_file = open(os.path.join(parent_dir, self.save_game_path), "w")
 
         level_as_json_string = '{' \
                                '"' + self.structuresVar + '": [],' \
@@ -238,7 +240,6 @@ class LevelWriter(object):
                                                                                                                                                                                                                        '"' + self.ironVar + '": 0}' \
                                                                                                                                                                                                                                             '}'
         json_obj = json.loads(level_as_json_string)
-
 
         for row in self.level.mapAsTileRows:
             temp_tile_shortcut_array = []
