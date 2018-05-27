@@ -142,6 +142,32 @@ class SaveMenu(tkinter.Frame):
         self.is_active = False
         self.root.destroy()
 
+class MainMenu(object):
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.title("Main Menu")
+        self.root.geometry("500x500")
+        self.root.protocol("WM_DELETE_WINDOW", self.close_main_menu)  #
+        self.new_game_button = create_button(self.root, "New game", self.launch_new_game, 225, 50)
+        self.load_game_button = create_button(self.root, "Load game", self.load_game, 225, 100)
+        self.options_button = create_button(self.root, "Options", self.options, 225, 150)
+        self.close_button = create_button(self.root, "Close", self.close_main_menu, 225, 250)
+
+    def options(self):
+        print("Options")
+
+    def load_game(self):
+        print("Load Game")
+
+    def launch_new_game(self):
+        print("New game")
+
+    def close_main_menu(self):
+        self.root.destroy()
+
+    def start(self):
+        self.root.mainloop()
+
 
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,
                  borderwith=0,
