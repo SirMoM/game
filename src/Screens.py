@@ -1,3 +1,6 @@
+import glob
+import os
+
 from src import Tiles, Structures, main_game
 import tkinter
 from src.Utilities import ColorHex
@@ -142,31 +145,81 @@ class SaveMenu(tkinter.Frame):
         self.is_active = False
         self.root.destroy()
 
-class MainMenu(object):
-    def __init__(self):
-        self.root = tkinter.Tk()
+
+class MainMenu:
+    def __init__(self, root: tkinter.Tk):
+        self.root = root
         self.root.title("Main Menu")
-        self.root.geometry("500x500")
-        self.root.protocol("WM_DELETE_WINDOW", self.close_main_menu)  #
-        self.new_game_button = create_button(self.root, "New game", self.launch_new_game, 225, 50)
-        self.load_game_button = create_button(self.root, "Load game", self.load_game, 225, 100)
-        self.options_button = create_button(self.root, "Options", self.options, 225, 150)
-        self.close_button = create_button(self.root, "Close", self.close_main_menu, 225, 250)
+        self.root.geometry("400x400")
+        self.root.protocol("WM_DELETE_WINDOW", self.close_main_menu)
+
+        self.main_frame = tkinter.Frame(self.root)
+        self.main_frame.grid()
+
+        new_game_button = tkinter.Button(master=self.main_frame, text="New game", command=self.launch_new_game)
+        new_game_button.grid(row=0, column=0)
+
+        load_game_button = tkinter.Button(master=self.main_frame, text="Load game", command=self.load_game)
+        load_game_button.grid(row=1, column=0)
+
+        options_button = tkinter.Button(master=self.main_frame, text="Options", command=self.options)
+        options_button.grid(row=2, column=0)
+
+        close_button = tkinter.Button(master=self.main_frame, text="Close", command=self.close_main_menu)
+        close_button.grid(row=3, column=0)
 
     def options(self):
         print("Options")
+        self.main_frame.destroy()
 
     def load_game(self):
         print("Load Game")
+        self.main_frame.destroy()
+
+        parent_dir = os.path.dirname(os.getcwd())
+        save_folder = os.path.join(parent_dir, "saves")
+        os.chdir(save_folder)
+
+        self.load_game_sub_frame = tkinter.Frame(self.root).pack()
+
+        yPos: int = 100
+        for file in glob.glob("*.json"):
+            file_path = os.path.join(save_folder, file)
+            print(file_path)
+
+            buttons = tkinter.Button(master=self.load_game_sub_frame, text=file,
+                                     command=lambda: self.start_game(file_path))
+            buttons.place(x=10, y=yPos)
+            yPos += 30
 
     def launch_new_game(self):
         print("New game")
+        self.main_frame.destroy()
+        self.new_game_sub_frame = tkinter.Frame(self.root).pack()
+        # self.new_game_sub_frame.grid()
+        level_1 = "maps/level_1.map"
+        level_2 = "maps/level_2.map"
+
+        map_1_button = tkinter.Button(master=self.new_game_sub_frame, text="Map 1",
+                                      command=lambda: self.start_game(level_1))
+        map_1_button.place(x=100, y=10)
+
+        map_2_button = tkinter.Button(master=self.new_game_sub_frame, text="Map 2",
+                                      command=lambda: self.start_game(level_2))
+        map_2_button.place(x=100, y=40)
 
     def close_main_menu(self):
         self.root.destroy()
 
     def start(self):
         self.root.mainloop()
+
+    def start_game(self, map_to_load: str):
+        self.root.destroy()
+        level = main_game.LevelParser(map_to_load).get_level()
+        new_game = main_game.Game()
+        new_game.level = level
+        new_game.execute()
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,
