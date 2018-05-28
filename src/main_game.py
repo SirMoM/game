@@ -142,6 +142,9 @@ class Game:
             text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
 
+    def close_game(self):
+        self.running = False
+        pygame.quit()
 
 class LevelParser:
     mapVar = "map"
