@@ -160,13 +160,13 @@ class MainMenu:
         new_game_button.grid(row=0, column=0)
 
         load_game_button = tkinter.Button(master=self.main_frame, text="Load game", command=self.load_game)
-        load_game_button.grid(row=1, column=0)
+        load_game_button.grid(row=1, column=1)
 
         options_button = tkinter.Button(master=self.main_frame, text="Options", command=self.options)
-        options_button.grid(row=2, column=0)
+        options_button.grid(row=2, column=2)
 
         close_button = tkinter.Button(master=self.main_frame, text="Close", command=self.close_main_menu)
-        close_button.grid(row=3, column=0)
+        close_button.grid(row=3, column=3)
 
     def options(self):
         print("Options")
@@ -179,18 +179,21 @@ class MainMenu:
         parent_dir = os.path.dirname(os.getcwd())
         save_folder = os.path.join(parent_dir, "saves")
         os.chdir(save_folder)
+        file_paths = []
 
         self.load_game_sub_frame = tkinter.Frame(self.root).pack()
 
-        yPos: int = 100
-        for file in glob.glob("*.json"):
-            file_path = os.path.join(save_folder, file)
-            print(file_path)
-
-            buttons = tkinter.Button(master=self.load_game_sub_frame, text=file,
-                                     command=lambda: self.start_game(file_path))
-            buttons.place(x=10, y=yPos)
-            yPos += 30
+        y_pos = 100
+        for root, dirs, files in os.walk(save_folder):
+            for file in files:
+                self.increment_button_pos()
+                path = os.path.join(root, file).__str__()
+                print(path)
+                b = tkinter.Button(master=self.load_game_sub_frame, text=file[:-5],
+                                   command=lambda p=path: self.start_game(p))
+                b.place(x=100, y=y_pos)
+                file_paths.append(os.path.join(root, file))
+            y_pos += 30
 
     def launch_new_game(self):
         print("New game")
@@ -216,7 +219,9 @@ class MainMenu:
 
     def start_game(self, map_to_load: str):
         self.root.destroy()
-        level = main_game.LevelParser(map_to_load).get_level()
+        map = map_to_load
+        print(map)
+        level = main_game.LevelParser(map).get_level()
         new_game = main_game.Game()
         new_game.level = level
         new_game.execute()
