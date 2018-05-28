@@ -84,15 +84,17 @@ class InGameMenu(tkinter.Frame):
         create_button(self.root, "Resume game", self.close, 100, 100)
         create_button(self.root, "Options", self.options, 100, 150)
         create_button(self.root, "Save Game", self.save_level, 100, 200)
-        create_button(self.root, "Close game", self.close_game, 100, 250)
+        create_button(self.root, "Main Menu", self.open_main_menu, 100, 250)
+        create_button(self.root, "Close game", self.close_game, 100, 300)
+
 
     def save_level(self):
-        temp_save_Menu = SaveMenu(self.game)
-        self.game.windows.append(temp_save_Menu)
+        temp_save_menu = SaveMenu(self.game)
+        self.game.windows.append(temp_save_menu)
         self.close()
 
     def close_game(self):
-        self.game.running = False
+        self.game.close_game()
 
     def options(self):
         self.close()
@@ -102,6 +104,11 @@ class InGameMenu(tkinter.Frame):
         self.is_active = False
         self.root.destroy()
 
+    def open_main_menu(self):
+        self.close()
+        self.game.close_game()
+
+        MainMenu(root=tkinter.Tk())
 
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
