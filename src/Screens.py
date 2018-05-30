@@ -1,6 +1,8 @@
 import glob
 import os
 
+import pygame
+
 from src import Tiles, Structures, main_game
 import tkinter
 from src.Utilities import ColorHex
@@ -67,7 +69,7 @@ class TileScreen(tkinter.Frame):
 
 
 class InGameMenu(tkinter.Frame):
-    def __init__(self, game) -> tkinter.Frame:
+    def __init__(self, game: main_game.Game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
 
@@ -87,14 +89,13 @@ class InGameMenu(tkinter.Frame):
         create_button(self.root, "Main Menu", self.open_main_menu, 100, 250)
         create_button(self.root, "Close game", self.close_game, 100, 300)
 
-
     def save_level(self):
         temp_save_menu = SaveMenu(self.game)
         self.game.windows.append(temp_save_menu)
         self.close()
 
     def close_game(self):
-        self.game.close_game()
+        self.game.close()
 
     def options(self):
         self.close()
@@ -106,9 +107,10 @@ class InGameMenu(tkinter.Frame):
 
     def open_main_menu(self):
         self.close()
-        self.game.close_game()
+        self.game.close()
 
         MainMenu(root=tkinter.Tk())
+
 
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
@@ -155,6 +157,7 @@ class SaveMenu(tkinter.Frame):
 
 class MainMenu:
     def __init__(self, root: tkinter.Tk):
+        self.y_pos = 20
         self.root = root
         self.root.title("Main Menu")
         self.root.geometry("400x400")
@@ -193,14 +196,9 @@ class MainMenu:
         y_pos = 100
         for root, dirs, files in os.walk(save_folder):
             for file in files:
-                self.increment_button_pos()
                 path = os.path.join(root, file).__str__()
                 print(path)
-                b = tkinter.Button(master=self.load_game_sub_frame, text=file[:-5],
-                                   command=lambda p=path: self.start_game(p))
-                b.place(x=100, y=y_pos)
-                file_paths.append(os.path.join(root, file))
-            y_pos += 30
+                self.make_game_saves_widget(path, file)
 
     def launch_new_game(self):
         print("New game")
@@ -232,6 +230,12 @@ class MainMenu:
         new_game = main_game.Game()
         new_game.level = level
         new_game.execute()
+
+    def make_game_saves_widget(self, save_path, file):
+        b = tkinter.Button(master=self.load_game_sub_frame, text=file[:-5],
+                           command=lambda p=save_path: self.start_game(p))
+        b.place(x=100, y=self.y_pos)
+        self.y_pos += 30
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,

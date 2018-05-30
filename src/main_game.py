@@ -60,6 +60,8 @@ class Game:
 
             self.render_on_loop(self.level)
 
+        pygame.display.quit()
+
     def on_event(self):
         for event in pygame.event.get():
             if event.type == self.resources_tick:
@@ -142,9 +144,9 @@ class Game:
             text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
 
-    def close_game(self):
+    def close(self):
         self.running = False
-        pygame.quit()
+
 
 class LevelParser:
     mapVar = "map"
@@ -228,7 +230,7 @@ class LevelWriter(object):
         self.filename = filename
         self.level = level
         self.save_game_path = "saves/" + filename + ".json"
-        #TODO FIX
+        # TODO FIX
         self.save_game_file = open(os.path.join(parent_dir, self.save_game_path), "w")
 
         level_as_json_string = '{' \
