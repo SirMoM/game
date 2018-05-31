@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import random
 import sys
 import json
 
@@ -36,23 +37,33 @@ class Game:
     FPS = 60
     level = None
     windows = []
+    songs = []
+    music_volume = 11
+    playtime = 0
+    millis = 0
+    resources_event_id = 25
+    game_icon = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
 
     def __init__(self):
-        self.millis = 0
-        self.playtime = 0
-        self.running = True
         print("New Game")
-        pygame.init()
+        pygame.mixer.init()
         pygame.font.init()
-        self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
+        pygame.init()
+
+        self.running = True
         self.clock = pygame.time.Clock()
+
+        pygame.display.set_icon(pygame.image.load(self.game_icon))
+
         self.screen = pygame.display.set_mode((500, 500))
         self.screen.fill(ColorRGB.grey)
-        self.resources_tick = 25
+
+        self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
+
+        self.init_bg_music()
 
     def execute(self):
-        pygame.time.set_timer(self.resources_tick, 1000)
-
+        pygame.time.set_timer(self.resources_event_id, 1000)
         while self.running:
             self.on_event()
 
@@ -64,8 +75,8 @@ class Game:
 
     def on_event(self):
         for event in pygame.event.get():
-            if event.type == self.resources_tick:
-                pygame.time.set_timer(self.resources_tick, 1000)
+            if event.type == self.resources_event_id:
+                pygame.time.set_timer(self.resources_event_id, 1000)
                 for structures in self.level.structures:
                     if type(structures) is Structures.LumberJack:
                         self.level.wood += structures.resources_per_loop
@@ -99,6 +110,7 @@ class Game:
         # Time
         self.millis = self.clock.tick(self.FPS)
         self.playtime += self.millis / 1000
+        self.playmusic(self.music_volume)
 
     def render_on_loop(self, level: Level):
         """:type level: Level"""
@@ -129,23 +141,34 @@ class Game:
         if self.level.wood >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
             str_anz_wood = ": %.f" % self.level.wood
-            text_surface = self.my_font.render(str_anz_wood, False, (0, 0, 0))
+            text_surface = self.comic_sans_30.render(str_anz_wood, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 5))
 
         if self.level.stone >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
             str_anz_stone = ": %.f" % self.level.stone
-            text_surface = self.my_font.render(str_anz_stone, False, (0, 0, 0))
+            text_surface = self.comic_sans_30.render(str_anz_stone, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 42))
 
         if self.level.iron >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/iron.png")), (10, 74))
             str_anz_iron = ": %.f" % self.level.iron
-            text_surface = self.my_font.render(str_anz_iron, False, (0, 0, 0))
+            text_surface = self.comic_sans_30.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
 
     def close(self):
         self.running = False
+
+    def playmusic(self, volume):
+        if not pygame.mixer.music.get_busy():
+            self.current_song_id = random.randint(0, self.songs.__len__() - 1)
+            pygame.mixer.music.load(self.songs[self.current_song_id])
+            pygame.mixer.music.set_volume(round(volume / 100, 2))
+            pygame.mixer.music.play()
+
+    def init_bg_music(self):
+        self.songs.append(os.path.join(parent_dir, "Glorious_Morning_Waterflame.mp3"))
+        # add more musik ?
 
 
 class LevelParser:
