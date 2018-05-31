@@ -177,6 +177,7 @@ class MainMenu:
 
         close_button = tkinter.Button(master=self.main_frame, text="Close", command=self.close_main_menu)
         close_button.grid(row=3, column=3)
+        self.root.attributes("-topmost", True)
 
     def options(self):
         print("Options")
