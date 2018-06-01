@@ -96,7 +96,6 @@ class InGameMenu(tkinter.Frame):
         self.game.close()
 
     def options(self):
-        self.close()
         # TODO get_config_parser the Options Screen
 
     def close(self):
