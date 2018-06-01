@@ -1,10 +1,8 @@
-import glob
 import os
-
-import pygame
+import tkinter
 
 from src import Tiles, Structures, main_game
-import tkinter
+from src import config as cfg
 from src.Utilities import ColorHex
 
 
@@ -99,7 +97,7 @@ class InGameMenu(tkinter.Frame):
 
     def options(self):
         self.close()
-        # TODO open the Options Screen
+        # TODO get_config_parser the Options Screen
 
     def close(self):
         self.is_active = False
@@ -162,7 +160,24 @@ class MainMenu:
         self.root.title("Main Menu")
         self.root.geometry("400x400")
         self.root.protocol("WM_DELETE_WINDOW", self.close_main_menu)
+        self.root.attributes("-topmost", True)
 
+        self.main_menu_components()
+
+    def options(self):
+        print("Options")
+        self.main_frame.destroy()
+        self.option_frame = OptionFrame(self.root)
+        create_button(self.option_frame.pack(), "Back", self.back_to_myself, 200, 300)
+        self.option_frame.pack()
+
+    def back_to_myself(self):
+        for ele in self.root.winfo_children():
+            ele.destroy()
+
+        self.main_menu_components()
+
+    def main_menu_components(self):
         self.main_frame = tkinter.Frame(self.root)
         self.main_frame.grid()
 
@@ -177,11 +192,6 @@ class MainMenu:
 
         close_button = tkinter.Button(master=self.main_frame, text="Close", command=self.close_main_menu)
         close_button.grid(row=3, column=3)
-        self.root.attributes("-topmost", True)
-
-    def options(self):
-        print("Options")
-        self.main_frame.destroy()
 
     def load_game(self):
         print("Load Game")
@@ -239,6 +249,21 @@ class MainMenu:
         self.y_pos += 30
 
 
+class OptionFrame(tkinter.Frame):
+    def __init__(self, master):
+        super(OptionFrame, self).__init__(master)
+        create_label(self.pack(), "Volume: ", 50, 100, bg_color=ColorHex.white)
+        self.scale = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
+        self.scale.place(x=50, y=120)
+
+        create_button(self.pack(), "Save options", self.save_options, 100, 300)
+
+    def save_options(self):
+        # TODO write the input in the config File
+        cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale.get() / 100))
+
+
+
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,
                  borderwith=0,
                  relief=None) -> tkinter.Label:
@@ -263,10 +288,10 @@ def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_col
     return label
 
 
-def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_color=None) -> tkinter.Button:
+def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_color=None, bd=5) -> tkinter.Button:
     button = tkinter.Button(screen, text=text, command=command)
     button["bg"] = bg_color
-    button["bd"] = 5
+    button["bd"] = bd
     button.place(x=xPos, y=yPos)
     return button
 
