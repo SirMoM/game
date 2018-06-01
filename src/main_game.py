@@ -3,9 +3,10 @@ import os
 import random
 import sys
 import json
+import pygame
 
 from src import Screens, Tiles, Structures
-import pygame
+from src import config as cfg
 from src.Utilities import ColorRGB
 
 __author__ = "Noah Ruben"
@@ -38,7 +39,7 @@ class Game:
     level = None
     windows = []
     songs = []
-    music_volume = 11
+    music_volume = 100
     playtime = 0
     millis = 0
     resources_event_id = 25
@@ -49,6 +50,8 @@ class Game:
         pygame.mixer.init()
         pygame.font.init()
         pygame.init()
+
+        self.load_settings()
 
         self.running = True
         self.clock = pygame.time.Clock()
@@ -71,6 +74,7 @@ class Game:
 
             self.render_on_loop(self.level)
 
+        pygame.mixer.music.stop()
         pygame.display.quit()
 
     def on_event(self):
@@ -163,12 +167,15 @@ class Game:
         if not pygame.mixer.music.get_busy():
             self.current_song_id = random.randint(0, self.songs.__len__() - 1)
             pygame.mixer.music.load(self.songs[self.current_song_id])
-            pygame.mixer.music.set_volume(round(volume / 100, 2))
+            pygame.mixer.music.set_volume(float(volume))
             pygame.mixer.music.play()
 
     def init_bg_music(self):
-        self.songs.append(os.path.join(parent_dir, "Glorious_Morning_Waterflame.mp3"))
+        self.songs.append(os.path.join(parent_dir, "sounds/Glorious_Morning_Waterflame.mp3"))
         # add more musik ?
+
+    def load_settings(self):
+        self.music_volume = cfg.get_value(cfg.sound_section, cfg.music_volume_option)
 
 
 class LevelParser:
@@ -253,7 +260,6 @@ class LevelWriter(object):
         self.filename = filename
         self.level = level
         self.save_game_path = "saves/" + filename + ".json"
-        # TODO FIX
         self.save_game_file = open(os.path.join(parent_dir, self.save_game_path), "w")
 
         level_as_json_string = '{' \
