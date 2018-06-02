@@ -97,7 +97,6 @@ class InGameMenu:
         back_button = tkinter.Button(master=self.save_menu, text="Back", command=self.back_to_main_frame)
         back_button.place(x=10, y=130)
 
-
     def close_game(self):
         self.close()
         self.game.close()
@@ -108,10 +107,9 @@ class InGameMenu:
         # TODO REdo it ?
         for ele in self.root.winfo_children():
             ele.destroy()
-        self.optiones = OptionFrame(self.root)
+        self.optiones = OptionFrame(self.root, game=self.game)
         back_button = tkinter.Button(master=self.optiones.pack(), text="Back", command=self.back_to_main_frame)
         back_button.place(x=200, y=300)
-
 
     def close(self):
         self.is_active = False
@@ -136,7 +134,6 @@ class InGameMenu:
         self.game.load_settings()
 
 
-
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
 
@@ -153,7 +150,6 @@ class SaveMenu(tkinter.Frame):
         create_label(self.pack(), "Name of your Save:", 0, 0)
         self.input_textfield = Textfield(self.pack(), xPos=0, yPos=60)
         create_button(self.pack(), "Save", self.save, 0, 80)
-
 
     def save(self):
         input_is_valid = True
@@ -274,7 +270,8 @@ class MainMenu:
 
 
 class OptionFrame(tkinter.Frame):
-    def __init__(self, master):
+    def __init__(self, master, game=None):
+        self.game = game
         super(OptionFrame, self).__init__(master)
         create_label(self.pack(), "Volume: ", 50, 100, bg_color=ColorHex.white)
         self.scale = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
@@ -284,6 +281,8 @@ class OptionFrame(tkinter.Frame):
 
     def save_options(self):
         cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale.get() / 100))
+        if self.game is not None:
+            self.game.load_settings()
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,
