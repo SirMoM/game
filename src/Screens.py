@@ -66,41 +66,57 @@ class TileScreen(tkinter.Frame):
         self.create_things()
 
 
-class InGameMenu(tkinter.Frame):
+class InGameMenu:
     def __init__(self, game: main_game.Game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
 
         self.root = tkinter.Tk()
         self.root.title("Menu")
-        self.root.geometry("300x400+100+100")
+        self.root.geometry("400x400+100+100")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
-        super().__init__(self.root)
-        self.pack()
 
         self.make_widgets()
 
     def make_widgets(self):
-        create_button(self.root, "Resume game", self.close, 100, 100)
-        create_button(self.root, "Options", self.options, 100, 150)
-        create_button(self.root, "Save Game", self.save_level, 100, 200)
-        create_button(self.root, "Main Menu", self.open_main_menu, 100, 250)
-        create_button(self.root, "Close game", self.close_game, 100, 300)
+        self.main_frame = tkinter.Frame(self.root)
+        self.main_frame_packed = self.main_frame.pack()
+        create_button(self.main_frame_packed, "Resume game", self.close, 100, 100)
+        create_button(self.main_frame_packed, "Options", self.options, 100, 150)
+        create_button(self.main_frame_packed, "Save Game", self.save_level, 100, 200)
+        create_button(self.main_frame_packed, "Main Menu", self.open_main_menu, 100, 250)
+        create_button(self.main_frame_packed, "Close game", self.close_game, 100, 300)
 
     def save_level(self):
-        temp_save_menu = SaveMenu(self.game)
-        self.game.windows.append(temp_save_menu)
-        self.close()
+        self.main_frame.destroy()
+        # not a good solution
+        # TODO REdo it ?
+        for ele in self.root.winfo_children():
+            ele.destroy()
+        self.save_menu = SaveMenu(self.root, self.game).pack()
+        back_button = tkinter.Button(master=self.save_menu, text="Back", command=self.back_to_main_frame)
+        back_button.place(x=10, y=130)
+
 
     def close_game(self):
+        self.close()
         self.game.close()
 
     def options(self):
-        # TODO get_config_parser the Options Screen
-        pass
+        self.main_frame.destroy()
+        # not a good solution
+        # TODO REdo it ?
+        for ele in self.root.winfo_children():
+            ele.destroy()
+        self.optiones = OptionFrame(self.root)
+        back_button = tkinter.Button(master=self.optiones.pack(), text="Back", command=self.back_to_main_frame)
+        back_button.place(x=200, y=300)
+
 
     def close(self):
         self.is_active = False
+        for ele in self.root.winfo_children():
+            ele.destroy()
         self.root.destroy()
 
     def open_main_menu(self):
@@ -109,28 +125,35 @@ class InGameMenu(tkinter.Frame):
 
         MainMenu(root=tkinter.Tk())
 
+    def update(self):
+        self.root.update()
+
+    def back_to_main_frame(self):
+        for ele in self.root.winfo_children():
+            ele.destroy()
+
+        self.make_widgets()
+        self.game.load_settings()
+
+
 
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
 
-    def __init__(self, game) -> tkinter.Frame:
+    def __init__(self, root, game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
         self.input_textfield: Textfield = None
 
-        self.root = tkinter.Tk()
-        self.root.title("Menu")
-        self.root.geometry("250x120")
-        self.root.protocol("WM_DELETE_WINDOW", self.close)
-        super().__init__(self.root)
-        self.pack()
+        super().__init__(root)
 
         self.make_widgets()
 
     def make_widgets(self):
-        create_label(self.root, "Name of your Save:", 0, 0)
-        self.input_textfield = Textfield(self.root, xPos=0, yPos=60)
-        create_button(self.root, "Save", self.save, 0, 80)
+        create_label(self.pack(), "Name of your Save:", 0, 0)
+        self.input_textfield = Textfield(self.pack(), xPos=0, yPos=60)
+        create_button(self.pack(), "Save", self.save, 0, 80)
+
 
     def save(self):
         input_is_valid = True
@@ -138,19 +161,20 @@ class SaveMenu(tkinter.Frame):
         user_input = self.input_textfield.get_user_input()
         for symbol in self.forbidden_characters:
             if symbol in user_input:
-                create_label(self.root, '"/", "\\", "<", ">", ":", """, "|", "?", "*", " ", "." \n are not allowed', 0,
+                create_label(self.pack(), '"/", "\\", "<", ">", ":", """, "|", "?", "*", " ", "." \n are not allowed',
+                             0,
                              25, height=2)
                 self.input_textfield.mark_false_input(user_input)
                 input_is_valid = False
 
         if input_is_valid:
             main_game.LevelWriter(user_input, self.game.level)
-            create_label(self.root, 'Saved', 0, 25, height=2)
+            create_label(self.pack(), 'Saved', 0, 25, height=2)
             self.close()
 
     def close(self):
         self.is_active = False
-        self.root.destroy()
+        self.destroy()
 
 
 class MainMenu:
@@ -259,9 +283,7 @@ class OptionFrame(tkinter.Frame):
         create_button(self.pack(), "Save options", self.save_options, 100, 300)
 
     def save_options(self):
-        # TODO write the input in the config File
         cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale.get() / 100))
-
 
 
 def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_color=ColorHex.white, height=1,

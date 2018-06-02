@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 import random
 import sys
-import json
+
 import pygame
 
 from src import Screens, Tiles, Structures
@@ -164,10 +165,10 @@ class Game:
         self.running = False
 
     def playmusic(self, volume):
+        pygame.mixer.music.set_volume(float(volume))
         if not pygame.mixer.music.get_busy():
             self.current_song_id = random.randint(0, self.songs.__len__() - 1)
             pygame.mixer.music.load(self.songs[self.current_song_id])
-            pygame.mixer.music.set_volume(float(volume))
             pygame.mixer.music.play()
 
     def init_bg_music(self):
@@ -224,11 +225,14 @@ class LevelParser:
                 pos_x += 40
                 if self.structuresAsRowArray:
                     temp_structure = create_structure(self.structuresAsRowArray[row_index][tile_shortcut_index])
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index),
                                                   structure=temp_structure))
                     self.level.structures.append(temp_structure)
                 else:
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y)))
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index)))
+
+            for tile in temp_array:
+                print(tile)
 
             pos_x = 100
             self.level.mapAsTileRows.append(temp_array)
@@ -303,31 +307,31 @@ class LevelWriter(object):
         return row_json_object
 
 
-def create_tile(shortcut: str, pos: tuple, structure: Structures.Structure = None):
+def create_tile(shortcut: str, pos: tuple, rel_pos, structure: Structures.Structure = None):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
-        temp = Tiles.NormalTile(pos)
+        temp = Tiles.NormalTile(pos, rel_pos)
         temp.set_structure(structure)
         return temp
     elif shortcut == Tiles.ForestTile.shortcut:
-        temp = Tiles.ForestTile(pos)
+        temp = Tiles.ForestTile(pos, rel_pos)
         temp.set_structure(structure)
         return temp
     elif shortcut == Tiles.MineTile.shortcut:
-        temp = Tiles.MineTile(pos)
+        temp = Tiles.MineTile(pos, rel_pos)
         temp.set_structure(structure)
         return temp
     elif shortcut == Tiles.LakeTile.shortcut:
-        temp = Tiles.LakeTile(pos)
+        temp = Tiles.LakeTile(pos, rel_pos)
         temp.set_structure(structure)
         return temp
     elif shortcut == Tiles.MountainTile.shortcut:
-        temp = Tiles.MountainTile(pos)
+        temp = Tiles.MountainTile(pos, rel_pos)
         temp.set_structure(structure)
         return temp
     else:
         print("There went something wrong for creating the Tile")
-        return Tiles.NormalTile(pos)
+        return Tiles.NormalTile(pos, rel_pos)
 
 
 def create_structure(shortcut: str):
