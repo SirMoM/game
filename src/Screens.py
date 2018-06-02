@@ -275,6 +275,7 @@ class OptionFrame(tkinter.Frame):
         super(OptionFrame, self).__init__(master)
         create_label(self.pack(), "Volume: ", 50, 100, bg_color=ColorHex.white)
         self.scale = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
+        self.scale.set((float(cfg.get_value(cfg.sound_section, cfg.music_volume_option)) * 100))
         self.scale.place(x=50, y=120)
 
         create_button(self.pack(), "Save options", self.save_options, 100, 300)
