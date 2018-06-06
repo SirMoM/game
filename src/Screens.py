@@ -235,7 +235,7 @@ class MainMenu:
         print("New game")
         self.main_frame.destroy()
         self.new_game_sub_frame = tkinter.Frame(self.root).pack()
-        # self.new_game_sub_frame.grid()
+
         level_1 = "maps/level_1.map"
         level_2 = "maps/level_2.map"
 
