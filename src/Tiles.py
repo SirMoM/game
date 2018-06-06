@@ -56,7 +56,7 @@ class NormalTile(Tile):
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
-        self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
+        self.associated_structure_pos = (tile_pos[0], tile_pos[1])
         self.rel_pos_tuple = rel_pos
 
 

@@ -220,11 +220,9 @@ class MainMenu:
         parent_dir = os.path.dirname(os.getcwd())
         save_folder = os.path.join(parent_dir, "saves")
         os.chdir(save_folder)
-        file_paths = []
 
         self.load_game_sub_frame = tkinter.Frame(self.root).pack()
 
-        y_pos = 100
         for root, dirs, files in os.walk(save_folder):
             for file in files:
                 path = os.path.join(root, file).__str__()

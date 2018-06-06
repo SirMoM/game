@@ -49,3 +49,13 @@ class IronMine(Structure):
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
+
+
+class Castle(Structure):
+    resources_per_loop = 0
+    resources_type = ""
+    shortcut = "C"
+    name = "Castle"
+
+    def __init__(self):
+        self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))

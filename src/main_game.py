@@ -342,5 +342,7 @@ def create_structure(shortcut: str):
         return Structures.Quarry()
     elif shortcut == Structures.IronMine.shortcut:
         return Structures.IronMine()
+    elif shortcut == Structures.Castle.shortcut:
+        return Structures.Castle()
     else:
         return None
