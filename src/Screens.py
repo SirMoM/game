@@ -1,7 +1,7 @@
 import os
 import tkinter
 
-from src import Tiles, Structures, main_game
+from src import Tiles, Structures, Game
 from src import config as cfg
 from src.Utilities import ColorHex
 
@@ -67,7 +67,7 @@ class TileScreen(tkinter.Frame):
 
 
 class InGameMenu:
-    def __init__(self, game: main_game.Game) -> tkinter.Frame:
+    def __init__(self, game: Game.Game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
         self.game.pause = True
@@ -167,7 +167,7 @@ class SaveMenu(tkinter.Frame):
                 input_is_valid = False
 
         if input_is_valid:
-            main_game.LevelWriter(user_input, self.game.level)
+            Game.LevelWriter(user_input, self.game.level)
             create_label(self.pack(), 'Saved', 0, 25, height=2)
             self.close()
 
@@ -264,8 +264,8 @@ class MainMenu:
         self.root.destroy()
         map = map_to_load
         print(map)
-        level = main_game.LevelParser(map).get_level()
-        new_game = main_game.Game()
+        level = Game.LevelParser(map).get_level()
+        new_game = Game.Game()
         new_game.level = level
         new_game.execute()
 

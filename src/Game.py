@@ -104,14 +104,15 @@ class Game:
                         self.level.iron += structures.resources_per_loop
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                xPos, yPos = pygame.mouse.get_pos()
+                if event.button == 1:
+                    xPos, yPos = pygame.mouse.get_pos()
+                    print("Click: ", xPos, yPos)
 
-                print("Click: ", xPos, yPos)
-                for row in self.level.mapAsTileRows:
-                    for tile in row:
-                        if tile.is_point_in_tile(xPos, yPos):
-                            tile_screen = Screens.TileScreen(self.level, tile)
-                            self.windows.append(tile_screen)
+                    for row in self.level.mapAsTileRows:
+                        for tile in row:
+                            if tile.is_point_in_tile(xPos, yPos):
+                                tile_screen = Screens.TileScreen(self.level, tile)
+                                self.windows.append(tile_screen)
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
