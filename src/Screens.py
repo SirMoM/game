@@ -203,7 +203,7 @@ class MainMenu:
         self.main_frame = tkinter.Frame(self.root)
         self.main_frame.grid()
 
-        new_game_button = tkinter.Button(master=self.main_frame, text="New game", command=self.launch_new_game)
+        new_game_button = tkinter.Button(master=self.main_frame, text="New game", command=self.new_game)
         new_game_button.grid(row=0, column=0)
 
         load_game_button = tkinter.Button(master=self.main_frame, text="Load game", command=self.load_game)
@@ -231,7 +231,9 @@ class MainMenu:
                 print(path)
                 self.make_game_saves_widget(path, file)
 
-    def launch_new_game(self):
+        create_button(self.load_game_sub_frame, "Back", self.back_to_myself, 200, 300)
+
+    def new_game(self):
         print("New game")
         self.main_frame.destroy()
         self.new_game_sub_frame = tkinter.Frame(self.root).pack()
@@ -246,6 +248,9 @@ class MainMenu:
         map_2_button = tkinter.Button(master=self.new_game_sub_frame, text="Map 2",
                                       command=lambda: self.start_game(level_2))
         map_2_button.place(x=100, y=40)
+
+        create_button(self.new_game_sub_frame, "Back", self.back_to_myself, 200, 300)
+
 
     def close_main_menu(self):
         self.root.destroy()
