@@ -55,6 +55,7 @@ class Game:
         self.load_settings()
 
         self.running = True
+        self.pause = False
         self.clock = pygame.time.Clock()
 
         pygame.display.set_icon(pygame.image.load(self.game_icon))
@@ -69,11 +70,23 @@ class Game:
     def execute(self):
         pygame.time.set_timer(self.resources_event_id, 1000)
         while self.running:
-            self.on_event()
+            if self.pause:
+                for event in pygame.event.get():
+                    if event.type == self.resources_event_id:
+                        pygame.time.set_timer(self.resources_event_id, 1000)
+                    elif event.type == pygame.QUIT:
+                        self.running = False
+                        pygame.quit()
+                        sys.exit()
 
-            self.on_loop()
+                self.playmusic(self.music_volume)
+                self.update_windows()
 
-            self.render_on_loop(self.level)
+
+            else:
+                self.on_event()
+                self.on_loop()
+                self.render_on_loop(self.level)
 
         pygame.mixer.music.stop()
         pygame.display.quit()
@@ -124,12 +137,7 @@ class Game:
         str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
 
-        for window in self.windows:
-            if window.is_active:
-                window.update()
-            else:
-                # if type(window) is Screens.InGameMenu:
-                self.windows.remove(window)
+        self.update_windows()
 
         self.render_reassures_bar()
 
@@ -141,6 +149,13 @@ class Game:
                 if tile.structure is not None:
                     self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
         pygame.display.flip()
+
+    def update_windows(self):
+        for window in self.windows:
+            if window.is_active:
+                window.update()
+            else:
+                self.windows.remove(window)
 
     def render_reassures_bar(self):
         if self.level.wood >= 1:
@@ -172,7 +187,7 @@ class Game:
             pygame.mixer.music.play()
 
     def init_bg_music(self):
-        self.songs.append(os.path.join(parent_dir, "sounds/Glorious_Morning_Waterflame.mp3"))
+        self.songs.append(os.path.join(parent_dir, "sounds/music/Glorious_Morning_Waterflame.mp3"))
         # add more musik ?
 
     def load_settings(self):
@@ -225,11 +240,13 @@ class LevelParser:
                 pos_x += 40
                 if self.structuresAsRowArray:
                     temp_structure = create_structure(self.structuresAsRowArray[row_index][tile_shortcut_index])
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index),
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                                                  (row_index, tile_shortcut_index),
                                                   structure=temp_structure))
                     self.level.structures.append(temp_structure)
                 else:
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index)))
+                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                                                  (row_index, tile_shortcut_index)))
 
             for tile in temp_array:
                 print(tile)

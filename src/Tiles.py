@@ -16,6 +16,7 @@ class Tile:
     shortcut = "D"
     rect = None
     rel_pos_tuple = ()
+    is_in_territory = False
 
     def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
         self.tile_pos = tile_pos

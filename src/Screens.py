@@ -70,6 +70,7 @@ class InGameMenu:
     def __init__(self, game: main_game.Game) -> tkinter.Frame:
         self.game = game
         self.is_active = True
+        self.game.pause = True
 
         self.root = tkinter.Tk()
         self.root.title("Menu")
@@ -113,6 +114,7 @@ class InGameMenu:
 
     def close(self):
         self.is_active = False
+        self.game.pause = False
         for ele in self.root.winfo_children():
             ele.destroy()
         self.root.destroy()
