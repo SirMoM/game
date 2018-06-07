@@ -75,6 +75,7 @@ class InGameMenu:
         self.root = tkinter.Tk()
         self.root.title("Menu")
         self.root.geometry("400x400+100+100")
+        self.root.iconbitmap(os.path.join(os.path.dirname(os.getcwd()), "textures/gloria_pause_icon.ico"))
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         self.make_widgets()
@@ -182,6 +183,7 @@ class MainMenu:
         self.root.title("Main Menu")
         self.root.geometry("400x400")
         self.root.protocol("WM_DELETE_WINDOW", self.close_main_menu)
+        self.root.iconbitmap(os.path.join(os.path.dirname(os.getcwd()), "textures/gloria_castle_icon.ico"))
         self.root.attributes("-topmost", True)
 
         self.main_menu_components()
@@ -325,7 +327,7 @@ def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_colo
 
 class Image:
     def __init__(self, screen, image_path: str):
-        self.img = tkinter.PhotoImage(file=image_path, name="TEST", master=screen)
+        self.img = tkinter.PhotoImage(file=image_path, master=screen)
         self.screen = screen
 
     def create_image(self, xPos, yPos, height, width):
