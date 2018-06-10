@@ -6,7 +6,7 @@ from src import config as cfg
 from src.Utilities import ColorHex
 
 
-class TileScreen(tkinter.Frame):
+class TileScreen:
 
     def __init__(self, level, tile: Tiles.Tile):
         self.root = tkinter.Tk()
@@ -16,58 +16,107 @@ class TileScreen(tkinter.Frame):
         self.is_active = True
 
         self.root.title(tile.name)
-        self.root.geometry("300x400")
+        self.root.geometry("300x450")
         self.root.protocol("WM_DELETE_WINDOW", self.close)
-        super().__init__(self.root)
-
-        self.pack()
 
         self.close_button = create_button(self.root, "X", self.close, 145, 375, bg_color=ColorHex.red)
-        self.create_things()
 
-    def create_things(self):
-        self.tile_img = Image(self.root, self.tile.img_path)
-        self.tile_img.create_image(50, 0, 200, 200)
-
-        if self.tile.get_structure():
-            structure_str = "Structure: " + self.tile.get_structure().name
-            resource_str = "Resources: " + str(
-                self.tile.get_structure().resources_per_loop) + " " + self.tile.get_structure().resources_type + " per second"
-            create_label(self.root, structure_str, 10, 100)
-            create_label(self.root, resource_str, 10, 200)
-
-        create_button(self.root, "Construction Lumber Jack", self.construction_lj, 10, 300)
-        create_button(self.root, "Construction Mine", self.construction_mine, 10, 335)
+        self.create_main_frame()
 
     def close(self):
         self.is_active = False
         self.root.destroy()
 
+    def update(self):
+        self.root.update()
+
     def construction_lj(self):
-        tempStructure = Structures.LumberJack()
+        temp_structure = Structures.LumberJack()
 
         previous_structure = self.tile.get_structure()
         if previous_structure is not None and previous_structure in self.level.structures:
             self.level.structures.remove(previous_structure)
 
-        self.tile.set_structure(tempStructure)
-        self.level.structures.append(tempStructure)
-        self.create_things()
+        self.tile.set_structure(temp_structure)
+        self.level.structures.append(temp_structure)
 
     def construction_mine(self):
-        tempStructure = Structures.IronMine()
+        temp_structure = Structures.IronMine()
 
         previous_structure = self.tile.get_structure()
         if previous_structure is not None and previous_structure in self.level.structures:
             self.level.structures.remove(previous_structure)
 
-        self.tile.set_structure(tempStructure)
-        self.level.structures.append(tempStructure)
-        self.create_things()
+        self.tile.set_structure(temp_structure)
+        self.level.structures.append(temp_structure)
+
+    def construction_quarry(self):
+        temp_structure = Structures.Quarry()
+
+        previous_structure = self.tile.get_structure()
+        if previous_structure is not None and previous_structure in self.level.structures:
+            self.level.structures.remove(previous_structure)
+
+        self.tile.set_structure(temp_structure)
+        self.level.structures.append(temp_structure)
+
+    def construction_castle(self):
+        temp_structure = Structures.Castle()
+
+        previous_structure = self.tile.get_structure()
+        if previous_structure is not None and previous_structure in self.level.structures:
+            self.level.structures.remove(previous_structure)
+
+        self.tile.set_structure(temp_structure)
+        self.level.structures.append(temp_structure)
+
+    def create_main_frame(self):
+        self.main_frame = tkinter.Frame(self.root)
+        self.main_frame_packed = self.main_frame.pack()
+
+        self.tile_img = Image(self.main_frame_packed, self.tile.img_path)
+        self.tile_img.create_image(50, 0, 200, 200)
+
+        structure_base_str = "Structure: {0}"
+        resource_base_str = "Resources: {0:.1f} {1} per second"
+        is_in_territory_base_str = "This is {0} in your Territory"
+
+        if self.tile.structure:
+            create_label(self.main_frame_packed, structure_base_str.format(self.tile.structure.name), 10, 220)
+            create_label(self.main_frame_packed, resource_base_str.format(self.tile.structure.resources_per_loop,
+                                                                          self.tile.structure.resources_type), 10, 250)
+        else:
+            create_label(self.main_frame_packed, structure_base_str.format("No building"), 10, 220)
+            create_label(self.main_frame_packed, resource_base_str.format(0.0, "resources"), 10, 250)
+
+        if self.tile.is_in_territory:
+            create_label(self.main_frame_packed, is_in_territory_base_str.format(self.tile.name, ""), 10, 280)
+        else:
+            create_label(self.main_frame_packed, is_in_territory_base_str.format("not"), 10, 280)
+
+        create_button(self.main_frame_packed, "Construction", self.create_construction_frame, 110, 320)
+
+    def create_construction_frame(self):
+        for ele in self.root.winfo_children():
+            ele.destroy()
+
+        self.construction_frame = tkinter.Frame(self.root)
+        create_button(self.root, "Construction Lumber Jack", self.construction_lj, 10, 220)
+        create_button(self.root, "Construction Mine", self.construction_mine, 10, 250)
+        create_button(self.root, "Construction Quarry", self.construction_quarry, 10, 280)
+        create_button(self.root, "Construction Castle", self.construction_castle, 10, 310)
+        create_button(self.root, "Back", self.back_to_main_frame, 110, 350)
+
+    def back_to_main_frame(self):
+        self.construction_frame.destroy()
+        for ele in self.root.winfo_children():
+            ele.destroy()
+
+        self.create_main_frame()
 
 
 class InGameMenu:
-    def __init__(self, game: Game.Game) -> tkinter.Frame:
+    def __init__(self, game: Game.Game):
         self.game = game
         self.is_active = True
         self.game.pause = True
@@ -252,7 +301,6 @@ class MainMenu:
         map_2_button.place(x=100, y=40)
 
         create_button(self.new_game_sub_frame, "Back", self.back_to_myself, 200, 300)
-
 
     def close_main_menu(self):
         self.root.destroy()

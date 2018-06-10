@@ -6,7 +6,7 @@ parent_dir = os.path.dirname(os.getcwd())
 
 
 class Structure:
-    resources_per_loop: str
+    resources_per_loop: float
     name: str
     structure_img: str
     shortcut = "D"
@@ -22,7 +22,7 @@ class Structure:
 
 
 class LumberJack(Structure):
-    resources_per_loop = 1
+    resources_per_loop = 1.0
     shortcut = "LJ"
     resources_type = "Wood"
     name = "Lumber Jack"
@@ -52,7 +52,7 @@ class IronMine(Structure):
 
 
 class Castle(Structure):
-    resources_per_loop = 0
+    resources_per_loop = 0.0
     resources_type = ""
     shortcut = "C"
     name = "Castle"
