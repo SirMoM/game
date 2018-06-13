@@ -20,6 +20,9 @@ class Structure:
         out_str = self.name + "Resource: " + self.resources_type
         return out_str
 
+    def can_build(self):
+        return False
+
 
 class LumberJack(Structure):
     resources_per_loop = 1.0
@@ -29,6 +32,12 @@ class LumberJack(Structure):
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures\structures\lumberJack.png"))
+
+    def can_build(self):
+        return True
+
+    def build(self):
+        print("bsafosdoifbüoids")
 
 
 class Quarry(Structure):
@@ -50,6 +59,9 @@ class IronMine(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
 
+    def can_build(self):
+        return True
+
 
 class Castle(Structure):
     resources_per_loop = 0.0
@@ -59,3 +71,6 @@ class Castle(Structure):
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))
+
+    def can_build(self):
+        return True

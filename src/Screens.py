@@ -1,7 +1,9 @@
+import inspect
 import os
+import sys
 import tkinter
 
-from src import Tiles, Structures, Game
+from src import Tiles, Game, Structures
 from src import config as cfg
 from src.Utilities import ColorHex
 
@@ -9,110 +11,114 @@ from src.Utilities import ColorHex
 class TileScreen:
 
     def __init__(self, level, tile: Tiles.Tile):
-        self.root = tkinter.Tk()
 
-        self.tile = tile
         self.level = level
+        self.tile = tile
         self.is_active = True
 
-        self.root.title(tile.name)
-        self.root.geometry("300x450")
-        self.root.protocol("WM_DELETE_WINDOW", self.close)
+        self.top_level = tkinter.Tk()
+        self.top_level.title(tile.name)
+        self.top_level.geometry("450x450")
+        self.top_level.protocol("WM_DELETE_WINDOW", self.close)
 
-        self.close_button = create_button(self.root, "X", self.close, 145, 375, bg_color=ColorHex.red)
+        self.tile_img = MyImage(self.top_level, self.tile.img_path)
+        self.tile_img.create_image(tkinter.TOP, 200, 200)
 
-        self.create_main_frame()
+        self.create_overview_frame()
 
     def close(self):
         self.is_active = False
-        self.root.destroy()
+        self.top_level.destroy()
 
     def update(self):
-        self.root.update()
+        self.top_level.update()
 
-    def construction_lj(self):
-        temp_structure = Structures.LumberJack()
+    def create_overview_frame(self):
+        abstand = 10
 
-        previous_structure = self.tile.get_structure()
-        if previous_structure is not None and previous_structure in self.level.structures:
-            self.level.structures.remove(previous_structure)
-
-        self.tile.set_structure(temp_structure)
-        self.level.structures.append(temp_structure)
-
-    def construction_mine(self):
-        temp_structure = Structures.IronMine()
-
-        previous_structure = self.tile.get_structure()
-        if previous_structure is not None and previous_structure in self.level.structures:
-            self.level.structures.remove(previous_structure)
-
-        self.tile.set_structure(temp_structure)
-        self.level.structures.append(temp_structure)
-
-    def construction_quarry(self):
-        temp_structure = Structures.Quarry()
-
-        previous_structure = self.tile.get_structure()
-        if previous_structure is not None and previous_structure in self.level.structures:
-            self.level.structures.remove(previous_structure)
-
-        self.tile.set_structure(temp_structure)
-        self.level.structures.append(temp_structure)
-
-    def construction_castle(self):
-        temp_structure = Structures.Castle()
-
-        previous_structure = self.tile.get_structure()
-        if previous_structure is not None and previous_structure in self.level.structures:
-            self.level.structures.remove(previous_structure)
-
-        self.tile.set_structure(temp_structure)
-        self.level.structures.append(temp_structure)
-
-    def create_main_frame(self):
-        self.main_frame = tkinter.Frame(self.root)
-        self.main_frame_packed = self.main_frame.pack()
-
-        self.tile_img = Image(self.main_frame_packed, self.tile.img_path)
-        self.tile_img.create_image(50, 0, 200, 200)
+        self.overview_frame = tkinter.Frame(self.top_level)
+        # self.overview_frame["bg"] = "red"
+        self.overview_frame.pack(fill=tkinter.BOTH, ipady=10, pady=5, expand=True)
 
         structure_base_str = "Structure: {0}"
         resource_base_str = "Resources: {0:.1f} {1} per second"
-        is_in_territory_base_str = "This is {0} in your Territory"
+        is_in_territory_base_str = "This area is {0} in your Territory"
 
         if self.tile.structure:
-            create_label(self.main_frame_packed, structure_base_str.format(self.tile.structure.name), 10, 220)
-            create_label(self.main_frame_packed, resource_base_str.format(self.tile.structure.resources_per_loop,
-                                                                          self.tile.structure.resources_type), 10, 250)
+            structure_label = tkinter.Label(self.overview_frame)
+            structure_label["text"] = structure_base_str.format(self.tile.structure.name)
+            structure_label.pack(side=tkinter.TOP, pady=abstand)
+
+            resource_label = tkinter.Label(self.overview_frame)
+            resource_label["text"] = resource_base_str.format(self.tile.structure.resources_per_loop,
+                                                              self.tile.structure.resources_type)
+            resource_label.pack(side=tkinter.TOP, pady=abstand)
+
         else:
-            create_label(self.main_frame_packed, structure_base_str.format("No building"), 10, 220)
-            create_label(self.main_frame_packed, resource_base_str.format(0.0, "resources"), 10, 250)
+            structure_label = tkinter.Label(self.overview_frame)
+            structure_label["text"] = structure_base_str.format("No building")
+            structure_label.pack(side=tkinter.TOP, pady=abstand)
+
+            resource_label = tkinter.Label(self.overview_frame)
+            resource_label["text"] = resource_base_str.format(0.0, "resources")
+            resource_label.pack(side=tkinter.TOP, pady=abstand)
 
         if self.tile.is_in_territory:
-            create_label(self.main_frame_packed, is_in_territory_base_str.format(self.tile.name, ""), 10, 280)
+            territory_label = tkinter.Label(self.overview_frame)
+            territory_label["text"] = is_in_territory_base_str.format(self.tile.name, "")
+            territory_label.pack(side=tkinter.TOP, pady=abstand)
         else:
-            create_label(self.main_frame_packed, is_in_territory_base_str.format("not"), 10, 280)
+            territory_label = tkinter.Label(self.overview_frame)
+            territory_label["text"] = is_in_territory_base_str.format("not")
+            territory_label.pack(side=tkinter.TOP, pady=abstand)
 
-        create_button(self.main_frame_packed, "Construction", self.create_construction_frame, 110, 320)
+        construction_button = tkinter.Button(self.overview_frame)
+        construction_button["text"] = "Construction"
+        construction_button["command"] = self.create_construction_frame
+        construction_button.pack(side=tkinter.BOTTOM, pady=abstand)
 
     def create_construction_frame(self):
-        for ele in self.root.winfo_children():
-            ele.destroy()
+        self.overview_frame.destroy()
 
-        self.construction_frame = tkinter.Frame(self.root)
-        create_button(self.root, "Construction Lumber Jack", self.construction_lj, 10, 220)
-        create_button(self.root, "Construction Mine", self.construction_mine, 10, 250)
-        create_button(self.root, "Construction Quarry", self.construction_quarry, 10, 280)
-        create_button(self.root, "Construction Castle", self.construction_castle, 10, 310)
-        create_button(self.root, "Back", self.back_to_main_frame, 110, 350)
+        self.construction_frame = tkinter.Frame(self.top_level)
+        # self.construction_frame["bg"] = "green"
+        self.construction_frame.pack(fill=tkinter.BOTH, ipady=10, pady=5, expand=True)
+
+        construction_options = tkinter.Listbox(self.construction_frame, height=5)
+
+        counter = 0
+        for option in self.get_construction_options(self.tile):
+            construction_options.insert(counter, option.name)
+            counter += 1
+
+        construction_options.pack(side=tkinter.TOP, pady=20)
+
+        build_button = tkinter.Button(self.construction_frame)
+        build_button["text"] = "Build"
+        build_button["command"] = lambda listbox=construction_options: self.build(listbox)
+        build_button.pack(side=tkinter.TOP)
+
+        construction_button = tkinter.Button(self.construction_frame)
+        construction_button["text"] = "Back"
+        construction_button["command"] = self.back_to_main_frame
+        construction_button.pack(side=tkinter.BOTTOM)
 
     def back_to_main_frame(self):
         self.construction_frame.destroy()
-        for ele in self.root.winfo_children():
-            ele.destroy()
+        self.create_overview_frame()
 
-        self.create_main_frame()
+    def get_construction_options(self, tile):
+        all_structures = get_all_structures()
+        construction_options = []
+        for structure in all_structures:
+            if structure.can_build(tile):
+                construction_options.append(structure)
+
+        return construction_options
+
+    def build(self, listbox):
+        print(listbox.curselection())
+        print("Building", listbox.get(listbox.curselection()[0]))
 
 
 class InGameMenu:
@@ -373,19 +379,19 @@ def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_colo
     return button
 
 
-class Image:
+class MyImage:
     def __init__(self, screen, image_path: str):
         self.img = tkinter.PhotoImage(file=image_path, master=screen)
         self.screen = screen
 
-    def create_image(self, xPos, yPos, height, width):
+    def create_image(self, side, height, width, fill=None):
         scale_w = round(width / self.img.width())
         scale_h = round(height / self.img.height())
         self.img = self.img.zoom(scale_w, scale_h)
 
         label = tkinter.Label(self.screen, image=self.img)
         label.image = self.img  # keep a reference!
-        label.place(x=xPos, y=yPos)
+        label.pack(side=side, fill=fill)
         return label
 
 
@@ -401,3 +407,12 @@ class Textfield:
         self.entry["bg"] = ColorHex.red
         self.entry.delete(0, len(self.entry.get()))
         self.entry.insert(0, text)
+
+
+def get_all_structures():
+    structures = []
+    for name, obj in inspect.getmembers(sys.modules[Structures.__name__]):
+        if inspect.isclass(obj):
+            structures.append(obj)
+
+    return structures
