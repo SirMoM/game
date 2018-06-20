@@ -79,7 +79,7 @@ class Game:
                         pygame.quit()
                         sys.exit()
 
-                self.playmusic(self.music_volume)
+                self.play_music(self.music_volume)
                 self.update_windows()
 
 
@@ -129,7 +129,7 @@ class Game:
         # Time
         self.millis = self.clock.tick(self.FPS)
         self.playtime += self.millis / 1000
-        self.playmusic(self.music_volume)
+        self.play_music(self.music_volume)
 
     def render_on_loop(self, level: Level):
         """:type level: Level"""
@@ -179,8 +179,13 @@ class Game:
 
     def close(self):
         self.running = False
+        for window in self.windows:
+            try:
+                window.close()
+            except BaseException:
+                print("Oops!  That was already closed")
 
-    def playmusic(self, volume):
+    def play_music(self, volume):
         pygame.mixer.music.set_volume(float(volume))
         if not pygame.mixer.music.get_busy():
             self.current_song_id = random.randint(0, self.songs.__len__() - 1)

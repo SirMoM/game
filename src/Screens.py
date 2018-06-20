@@ -136,23 +136,31 @@ class InGameMenu:
         self.make_widgets()
 
     def make_widgets(self):
+        distance = 10
         self.main_frame = tkinter.Frame(self.root)
-        self.main_frame_packed = self.main_frame.pack()
-        create_button(self.main_frame_packed, "Resume game", self.close, 100, 100)
-        create_button(self.main_frame_packed, "Options", self.options, 100, 150)
-        create_button(self.main_frame_packed, "Save Game", self.save_level, 100, 200)
-        create_button(self.main_frame_packed, "Main Menu", self.open_main_menu, 100, 250)
-        create_button(self.main_frame_packed, "Close game", self.close_game, 100, 300)
+        self.main_frame.pack()
+
+        close_game_button = GuiFactoryPack.button("Close Game", self.close_game, master=self.main_frame)
+        close_game_button.pack(side=tkinter.BOTTOM, pady=distance)
+
+        main_menu_button = GuiFactoryPack.button("Main Menu", self.open_main_menu, master=self.main_frame)
+        main_menu_button.pack(side=tkinter.BOTTOM, pady=distance)
+
+        options_button = GuiFactoryPack.button("Options", self.options, master=self.main_frame)
+        options_button.pack(side=tkinter.BOTTOM, pady=distance)
+
+        save_game_button = GuiFactoryPack.button("Save Game", self.save_level, master=self.main_frame)
+        save_game_button.pack(side=tkinter.BOTTOM, pady=distance)
+
+        resume_game_button = GuiFactoryPack.button("Resume game", self.close, master=self.main_frame)
+        resume_game_button.pack(side=tkinter.BOTTOM, pady=distance)
+
 
     def save_level(self):
         self.main_frame.destroy()
-        # not a good solution
-        # TODO REdo it ?
-        for ele in self.root.winfo_children():
-            ele.destroy()
-        self.save_menu = SaveMenu(self.root, self.game).pack()
+        self.save_menu = SaveMenu(self.root, self.game)
         back_button = tkinter.Button(master=self.save_menu, text="Back", command=self.back_to_main_frame)
-        back_button.place(x=10, y=130)
+        back_button.pack(side=tkinter.BOTTOM)
 
     def close_game(self):
         self.close()
@@ -160,19 +168,14 @@ class InGameMenu:
 
     def options(self):
         self.main_frame.destroy()
-        # not a good solution
-        # TODO REdo it ?
-        for ele in self.root.winfo_children():
-            ele.destroy()
-        self.optiones = OptionFrame(self.root, game=self.game)
-        back_button = tkinter.Button(master=self.optiones.pack(), text="Back", command=self.back_to_main_frame)
-        back_button.place(x=200, y=300)
+        self.options = OptionFrame(self.root, game=self.game)
+        self.options.pack()
+        back_button = GuiFactoryPack.button("Back", self.back_to_main_frame, master=self.options)
+        back_button.pack(side=tkinter.BOTTOM)
 
     def close(self):
         self.is_active = False
         self.game.pause = False
-        for ele in self.root.winfo_children():
-            ele.destroy()
         self.root.destroy()
 
     def open_main_menu(self):
@@ -201,30 +204,43 @@ class SaveMenu(tkinter.Frame):
         self.input_textfield: Textfield = None
 
         super().__init__(root)
+        self.pack(fill=tkinter.BOTH, expand=True)
 
         self.make_widgets()
 
     def make_widgets(self):
-        create_label(self.pack(), "Name of your Save:", 0, 0)
-        self.input_textfield = Textfield(self.pack(), xPos=0, yPos=60)
-        create_button(self.pack(), "Save", self.save, 0, 80)
+        save_label = GuiFactoryPack.label("Name of your Save:", master=self)
+        save_label.pack(side=tkinter.TOP, pady=(0, 30))
+
+        self.input_textfield = Textfield(self, side=tkinter.TOP, pad_y=10)
+
+        save_button = GuiFactoryPack.button("Save", self.save, self)
+        save_button.pack(side=tkinter.TOP, pady=0)
+        print()
 
     def save(self):
         input_is_valid = True
         self.input_textfield.entry["bg"] = ColorHex.white
+
         user_input = self.input_textfield.get_user_input()
+
         for symbol in self.forbidden_characters:
             if symbol in user_input:
-                create_label(self.pack(), '"/", "\\", "<", ">", ":", """, "|", "?", "*", " ", "." \n are not allowed',
-                             0,
-                             25, height=2)
+                forbidden_symbols_label = GuiFactoryPack.label(
+                    '"/", "\\", "<", ">", ":", """, "|", "?", "*", " ", "." \n are not allowed', master=self)
+                forbidden_symbols_label.height = 2
+                x = 200 - (forbidden_symbols_label["text"].__len__() / 2)
+                print(x)
+                forbidden_symbols_label.place(x=x / 2, y=20)
+
                 self.input_textfield.mark_false_input(user_input)
                 input_is_valid = False
 
         if input_is_valid:
             Game.LevelWriter(user_input, self.game.level)
-            create_label(self.pack(), 'Saved', 0, 25, height=2)
-            self.close()
+            saved_label = GuiFactoryPack.label("Saved", master=self)
+            saved_label.height = 2
+            saved_label.place(x=180, y=40)
 
     def close(self):
         self.is_active = False
@@ -333,7 +349,8 @@ class MainMenu:
 class OptionFrame(tkinter.Frame):
     def __init__(self, master, game=None):
         self.game = game
-        super(OptionFrame, self).__init__(master)
+        super().__init__(master)
+        self.pack(fill=tkinter.BOTH, expand=True)
         create_label(self.pack(), "Volume: ", 50, 100, bg_color=ColorHex.white)
         self.scale = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
         self.scale.set((float(cfg.get_value(cfg.sound_section, cfg.music_volume_option)) * 100))
@@ -396,9 +413,9 @@ class MyImage:
 
 
 class Textfield:
-    def __init__(self, screen, xPos, yPos):
+    def __init__(self, screen, side=None, pad_y=None, pad_x=None):
         self.entry = tkinter.Entry(screen)
-        self.entry.place(x=xPos, y=yPos)
+        self.entry.pack(side=side, pady=pad_y, padx=pad_x)
 
     def get_user_input(self):
         return self.entry.get()
@@ -416,3 +433,19 @@ def get_all_structures():
             structures.append(obj)
 
     return structures
+
+
+class GuiFactoryPack:
+
+    @staticmethod
+    def button(text: str, command, master=None):
+        button = tkinter.Button(master)
+        button["text"] = text
+        button["command"] = command
+        return button
+
+    @staticmethod
+    def label(text: str, master=None):
+        label = tkinter.Label(master)
+        label["text"] = text
+        return label
