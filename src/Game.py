@@ -19,6 +19,7 @@ parent_dir = os.path.dirname(os.getcwd())
 class Level:
     mapAsTileRows = []
     structures = []
+    constructions = []
     wood = 0
     stone = 0
     iron = 0
@@ -44,6 +45,7 @@ class Game:
     playtime = 0
     millis = 0
     resources_event_id = 25
+    construction_event_id = 26
     game_icon = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
 
     def __init__(self):
@@ -82,7 +84,6 @@ class Game:
                 self.play_music(self.music_volume)
                 self.update_windows()
 
-
             else:
                 self.on_event()
                 self.on_loop()
@@ -102,6 +103,11 @@ class Game:
                         self.level.stone += structures.resources_per_loop
                     elif type(structures) is Structures.IronMine:
                         self.level.iron += structures.resources_per_loop
+            if event.type == self.construction_event_id:
+
+                for construction in self.level.constructions:
+                    print(construction)
+                    construction.build_tick()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -331,21 +337,32 @@ class LevelWriter(object):
 
 
 class Construction:
-    def __init__(self, level, where: tuple, structure, time: int):
+    def __init__(self, level, where: tuple, structure_name, time: int):
+        pygame.time.set_timer(Game.construction_event_id, 1000)
         self.level = level
-        self.structure = structure
+        self.structure = create_structure(structure_name)
         self.time = time
         self.time_till_completion = time
         self.where_to_build = where
 
+    def build_tick(self):
+        self.time_till_completion -= 1
+
+        if self.time_till_completion == 0:
+            self.build_done()
+
     def build_done(self):
         tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
         tile.structure = self.structure
+        tile.construction = None
         self.level.structures.append(self.structure)
+        self.level.constructions.remove(self)
+
+    def __str__(self):
+        return str(self.time_till_completion) + " seconds till completion of the " + self.structure.name
 
 
 def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
-    # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
         temp = Tiles.NormalTile(pos, rel_pos)
         temp.set_structure(structure)
@@ -373,13 +390,13 @@ def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
 
 def create_structure(shortcut: str):
     # type: () -> Structures
-    if shortcut == Structures.LumberJack.shortcut:
+    if shortcut == Structures.LumberJack.shortcut or shortcut == Structures.LumberJack.name:
         return Structures.LumberJack()
-    elif shortcut == Structures.Quarry.shortcut:
+    elif shortcut == Structures.Quarry.shortcut or shortcut == Structures.Quarry.name:
         return Structures.Quarry()
-    elif shortcut == Structures.IronMine.shortcut:
+    elif shortcut == Structures.IronMine.shortcut or shortcut == Structures.IronMine.name:
         return Structures.IronMine()
-    elif shortcut == Structures.Castle.shortcut:
+    elif shortcut == Structures.Castle.shortcut or shortcut == Structures.Castle.name:
         return Structures.Castle()
     else:
         return None

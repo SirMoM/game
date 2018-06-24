@@ -24,7 +24,6 @@ class Structure:
 
     @staticmethod
     def can_build(tile):
-        print("Tile: ", tile)
         return False
 
 
@@ -39,7 +38,6 @@ class LumberJack(Structure):
 
     @staticmethod
     def can_build(tile):
-        print("Tile: ", tile.shortcut, LumberJack.shortcut)
         if tile.structure is None and tile.shortcut is Tiles.ForestTile.shortcut:
             return True
         else:
@@ -57,7 +55,6 @@ class Quarry(Structure):
 
     @staticmethod
     def can_build(tile):
-        print("Tile: ", tile)
         if tile.structure is None and tile.shortcut is Tiles.MountainTile.shortcut:
             return True
         else:
@@ -75,7 +72,6 @@ class IronMine(Structure):
 
     @staticmethod
     def can_build(tile):
-        print("Tile: ", tile)
         if tile.structure is None and tile.shortcut is Tiles.MineTile.shortcut:
             return True
         else:
@@ -93,7 +89,6 @@ class Castle(Structure):
 
     @staticmethod
     def can_build(tile):
-        print("Tile: ", tile)
         if tile.structure is None and tile.shortcut is Tiles.NormalTile.shortcut:
             return True
         else:

@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from src import Structures
+from src import Structures, Game
 
 parent_dir = os.path.dirname(os.getcwd())
 
@@ -19,6 +19,7 @@ class Tile:
     rect = None
     rel_pos_tuple = ()
     is_in_territory = False
+    construction: Game.Construction = None
 
     def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
         self.tile_pos = tile_pos

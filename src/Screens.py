@@ -16,6 +16,9 @@ class TileScreen:
         self.tile = tile
         self.is_active = True
 
+        self.construction_label = None
+        self.overview_frame = None
+
         self.top_level = tkinter.Tk()
         self.top_level.title(tile.name)
         self.top_level.geometry("450x450")
@@ -31,13 +34,17 @@ class TileScreen:
         self.top_level.destroy()
 
     def update(self):
+        if self.tile.construction is not None:
+            self.construction_label["text"] = self.tile.construction.__str__()
+        elif self.construction_label is not None and self.tile.construction is None:
+            self.construction_label.forget()
+
         self.top_level.update()
 
     def create_overview_frame(self):
-        abstand = 10
+        distance = 10
 
         self.overview_frame = tkinter.Frame(self.top_level)
-        # self.overview_frame["bg"] = "red"
         self.overview_frame.pack(fill=tkinter.BOTH, ipady=10, pady=5, expand=True)
 
         structure_base_str = "Structure: {0}"
@@ -47,35 +54,40 @@ class TileScreen:
         if self.tile.structure:
             structure_label = tkinter.Label(self.overview_frame)
             structure_label["text"] = structure_base_str.format(self.tile.structure.name)
-            structure_label.pack(side=tkinter.TOP, pady=abstand)
+            structure_label.pack(side=tkinter.TOP, pady=distance)
 
             resource_label = tkinter.Label(self.overview_frame)
             resource_label["text"] = resource_base_str.format(self.tile.structure.resources_per_loop,
                                                               self.tile.structure.resources_type)
-            resource_label.pack(side=tkinter.TOP, pady=abstand)
+            resource_label.pack(side=tkinter.TOP, pady=distance)
 
         else:
             structure_label = tkinter.Label(self.overview_frame)
             structure_label["text"] = structure_base_str.format("No building")
-            structure_label.pack(side=tkinter.TOP, pady=abstand)
+            structure_label.pack(side=tkinter.TOP, pady=distance)
 
             resource_label = tkinter.Label(self.overview_frame)
             resource_label["text"] = resource_base_str.format(0.0, "resources")
-            resource_label.pack(side=tkinter.TOP, pady=abstand)
+            resource_label.pack(side=tkinter.TOP, pady=distance)
 
         if self.tile.is_in_territory:
             territory_label = tkinter.Label(self.overview_frame)
             territory_label["text"] = is_in_territory_base_str.format(self.tile.name, "")
-            territory_label.pack(side=tkinter.TOP, pady=abstand)
+            territory_label.pack(side=tkinter.TOP, pady=distance)
         else:
             territory_label = tkinter.Label(self.overview_frame)
             territory_label["text"] = is_in_territory_base_str.format("not")
-            territory_label.pack(side=tkinter.TOP, pady=abstand)
+            territory_label.pack(side=tkinter.TOP, pady=distance)
+
+        if self.tile.construction is not None:
+            self.construction_label = tkinter.Label(self.overview_frame)
+            self.construction_label["text"] = self.tile.construction.__str__()
+            self.construction_label.pack(side=tkinter.TOP, pady=distance)
 
         construction_button = tkinter.Button(self.overview_frame)
         construction_button["text"] = "Construction"
         construction_button["command"] = self.create_construction_frame
-        construction_button.pack(side=tkinter.BOTTOM, pady=abstand)
+        construction_button.pack(side=tkinter.BOTTOM, pady=distance)
 
     def create_construction_frame(self):
         self.overview_frame.destroy()
@@ -87,7 +99,7 @@ class TileScreen:
         construction_options = tkinter.Listbox(self.construction_frame, height=5)
 
         counter = 0
-        for option in self.get_construction_options(self.tile):
+        for option in self.get_construction_options():
             construction_options.insert(counter, option.name)
             counter += 1
 
@@ -107,18 +119,21 @@ class TileScreen:
         self.construction_frame.destroy()
         self.create_overview_frame()
 
-    def get_construction_options(self, tile):
+    def get_construction_options(self):
         all_structures = get_all_structures()
         construction_options = []
         for structure in all_structures:
-            if structure.can_build(tile):
+            if structure.can_build(self.tile):
                 construction_options.append(structure)
 
         return construction_options
 
     def build(self, listbox):
-        print(listbox.curselection())
         print("Building", listbox.get(listbox.curselection()[0]))
+        self.tile.construction = Game.Construction(self.level, self.tile.rel_pos_tuple,
+                                                   listbox.get(listbox.curselection()[0]), 3)
+        self.level.constructions.append(self.tile.construction)
+        self.back_to_main_frame()
 
 
 class InGameMenu:
@@ -154,7 +169,6 @@ class InGameMenu:
 
         resume_game_button = GuiFactoryPack.button("Resume game", self.close, master=self.main_frame)
         resume_game_button.pack(side=tkinter.BOTTOM, pady=distance)
-
 
     def save_level(self):
         self.main_frame.destroy()
@@ -198,7 +212,7 @@ class InGameMenu:
 class SaveMenu(tkinter.Frame):
     forbidden_characters = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
 
-    def __init__(self, root, game) -> tkinter.Frame:
+    def __init__(self, root, game):
         self.game = game
         self.is_active = True
         self.input_textfield: Textfield = None
@@ -216,7 +230,6 @@ class SaveMenu(tkinter.Frame):
 
         save_button = GuiFactoryPack.button("Save", self.save, self)
         save_button.pack(side=tkinter.TOP, pady=0)
-        print()
 
     def save(self):
         input_is_valid = True
@@ -230,7 +243,6 @@ class SaveMenu(tkinter.Frame):
                     '"/", "\\", "<", ">", ":", """, "|", "?", "*", " ", "." \n are not allowed', master=self)
                 forbidden_symbols_label.height = 2
                 x = 200 - (forbidden_symbols_label["text"].__len__() / 2)
-                print(x)
                 forbidden_symbols_label.place(x=x / 2, y=20)
 
                 self.input_textfield.mark_false_input(user_input)
@@ -301,7 +313,6 @@ class MainMenu:
         for root, dirs, files in os.walk(save_folder):
             for file in files:
                 path = os.path.join(root, file).__str__()
-                print(path)
                 self.make_game_saves_widget(path, file)
 
         create_button(self.load_game_sub_frame, "Back", self.back_to_myself, 200, 300)
