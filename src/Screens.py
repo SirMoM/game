@@ -128,12 +128,13 @@ class TileScreen:
 
         return construction_options
 
-    def build(self, listbox):
-        print("Building", listbox.get(listbox.curselection()[0]))
-        self.tile.construction = Game.Construction(self.level, self.tile.rel_pos_tuple,
-                                                   listbox.get(listbox.curselection()[0]), 3)
-        self.level.constructions.append(self.tile.construction)
-        self.back_to_main_frame()
+    def build(self, listbox: tkinter.Listbox):
+        if listbox.curselection().__len__() > 0:
+            print("Building", listbox.get(listbox.curselection()[0]))
+            self.tile.construction = Game.Construction(self.level, self.tile.rel_pos_tuple,
+                                                       listbox.get(listbox.curselection()[0]), 3)
+            self.level.constructions.append(self.tile.construction)
+            self.back_to_main_frame()
 
 
 class InGameMenu:

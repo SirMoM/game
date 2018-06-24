@@ -13,6 +13,7 @@ class Structure:
     structure_img: str
     shortcut = "D"
     resources_type: str
+    build_costs = None
 
     def __init__(self, name, img):
         self.structure_img = img
@@ -32,6 +33,8 @@ class LumberJack(Structure):
     shortcut = "LJ"
     resources_type = "Wood"
     name = "Lumber Jack"
+    build_costs = 4, 0, 0
+    build_time = 3
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures\structures\lumberJack.png"))
@@ -49,6 +52,8 @@ class Quarry(Structure):
     shortcut = "Q"
     resources_type = "Stone"
     name = "Quarry"
+    build_costs = 10, 0, 0
+    build_time = 6
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/quarry.png"))
@@ -67,6 +72,9 @@ class IronMine(Structure):
     resources_type = "Iron"
     name = "Iron Mine"
 
+    build_costs = 8, 5, 0
+    build_time = 5
+
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
 
@@ -83,6 +91,8 @@ class Castle(Structure):
     resources_type = ""
     shortcut = "C"
     name = "Castle"
+    build_costs = 10, 10, 10
+    build_time = 10
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))

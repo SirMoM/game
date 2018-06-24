@@ -340,10 +340,15 @@ class Construction:
     def __init__(self, level, where: tuple, structure_name, time: int):
         pygame.time.set_timer(Game.construction_event_id, 1000)
         self.level = level
-        self.structure = create_structure(structure_name)
-        self.time = time
-        self.time_till_completion = time
         self.where_to_build = where
+        self.structure = create_structure(structure_name)
+        self.time_till_completion = time
+
+        self.tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
+        self.time = self.structure.build_time
+        self.level.wood -= self.structure.build_costs[0]
+        self.level.stone -= self.structure.build_costs[1]
+        self.level.iron -= self.structure.build_costs[2]
 
     def build_tick(self):
         self.time_till_completion -= 1
@@ -352,9 +357,8 @@ class Construction:
             self.build_done()
 
     def build_done(self):
-        tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
-        tile.structure = self.structure
-        tile.construction = None
+        self.tile.structure = self.structure
+        self.tile.construction = None
         self.level.structures.append(self.structure)
         self.level.constructions.remove(self)
 
