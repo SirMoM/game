@@ -330,7 +330,21 @@ class LevelWriter(object):
         return row_json_object
 
 
-def create_tile(shortcut: str, pos: tuple, rel_pos, structure: Structures.Structure = None):
+class Construction:
+    def __init__(self, level, where: tuple, structure, time: int):
+        self.level = level
+        self.structure = structure
+        self.time = time
+        self.time_till_completion = time
+        self.where_to_build = where
+
+    def build_done(self):
+        tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
+        tile.structure = self.structure
+        self.level.structures.append(self.structure)
+
+
+def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
     # type: () -> Tile
     if shortcut == Tiles.NormalTile.shortcut:
         temp = Tiles.NormalTile(pos, rel_pos)

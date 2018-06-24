@@ -1,5 +1,7 @@
 import os
+
 import pygame
+
 from src import Structures
 
 parent_dir = os.path.dirname(os.getcwd())
@@ -13,7 +15,7 @@ class Tile:
     associated_structure_pos = None
     has_structure = False
     structure = False
-    shortcut = "D"
+    shortcut: str = "D"
     rect = None
     rel_pos_tuple = ()
     is_in_territory = False

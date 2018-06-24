@@ -2,6 +2,8 @@ import os
 
 import pygame
 
+from src import Tiles
+
 parent_dir = os.path.dirname(os.getcwd())
 
 
@@ -20,7 +22,9 @@ class Structure:
         out_str = self.name + "Resource: " + self.resources_type
         return out_str
 
-    def can_build(self):
+    @staticmethod
+    def can_build(tile):
+        print("Tile: ", tile)
         return False
 
 
@@ -33,11 +37,13 @@ class LumberJack(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures\structures\lumberJack.png"))
 
-    def can_build(self):
-        return True
-
-    def build(self):
-        print("bsafosdoifbüoids")
+    @staticmethod
+    def can_build(tile):
+        print("Tile: ", tile.shortcut, LumberJack.shortcut)
+        if tile.structure is None and tile.shortcut is Tiles.ForestTile.shortcut:
+            return True
+        else:
+            return False
 
 
 class Quarry(Structure):
@@ -49,6 +55,14 @@ class Quarry(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/quarry.png"))
 
+    @staticmethod
+    def can_build(tile):
+        print("Tile: ", tile)
+        if tile.structure is None and tile.shortcut is Tiles.MountainTile.shortcut:
+            return True
+        else:
+            return False
+
 
 class IronMine(Structure):
     resources_per_loop = 0.3
@@ -59,8 +73,13 @@ class IronMine(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
 
-    def can_build(self):
-        return True
+    @staticmethod
+    def can_build(tile):
+        print("Tile: ", tile)
+        if tile.structure is None and tile.shortcut is Tiles.MineTile.shortcut:
+            return True
+        else:
+            return False
 
 
 class Castle(Structure):
@@ -72,5 +91,10 @@ class Castle(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))
 
-    def can_build(self):
-        return True
+    @staticmethod
+    def can_build(tile):
+        print("Tile: ", tile)
+        if tile.structure is None and tile.shortcut is Tiles.NormalTile.shortcut:
+            return True
+        else:
+            return False
