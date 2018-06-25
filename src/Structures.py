@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from src import Tiles
+from src import Tiles, Game
 
 parent_dir = os.path.dirname(os.getcwd())
 
@@ -93,9 +93,30 @@ class Castle(Structure):
     name = "Castle"
     build_costs = 10, 10, 10
     build_time = 10
+    tile_range = 3
+    tile = None
+    level: Game.Level
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))
+
+    def create_territory(self, tile, level: Game.Level):
+        self.tile = tile
+        self.level = level
+        territory_start = self.tile.rel_pos_tuple
+        for i in territory_start:
+            i -= self.tile_range
+
+        if territory_start[0] < 0:
+            territory_start[0] = 0
+        if territory_start[1] < 0:
+            territory_start[1] = 0
+
+        print("territory_start ", territory_start)
+
+        for i in range(territory_start[0], self.tile.rel_pos_tuple[0] + 3):
+            for j in range(territory_start[1], self.tile.rel_pos_tuple[1] + 3):
+                self.level.mapAsTileRows[i][j].is_in_territory = True
 
     @staticmethod
     def can_build(tile):

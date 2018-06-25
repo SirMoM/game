@@ -11,6 +11,7 @@ from src.Utilities import ColorHex
 class TileScreen:
 
     def __init__(self, level, tile: Tiles.Tile):
+        print(tile)
 
         self.level = level
         self.tile = tile
@@ -72,7 +73,7 @@ class TileScreen:
 
         if self.tile.is_in_territory:
             territory_label = tkinter.Label(self.overview_frame)
-            territory_label["text"] = is_in_territory_base_str.format(self.tile.name, "")
+            territory_label["text"] = is_in_territory_base_str.format("")
             territory_label.pack(side=tkinter.TOP, pady=distance)
         else:
             territory_label = tkinter.Label(self.overview_frame)

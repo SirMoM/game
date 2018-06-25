@@ -266,6 +266,11 @@ class LevelParser:
             pos_x = 100
             self.level.mapAsTileRows.append(temp_array)
 
+        for row in self.level.mapAsTileRows:
+            for tile in row:
+                if tile.structure is not None and type(tile.structure) == Structures.Castle:
+                    tile.structure.create_territory(tile=tile, level=self.level)
+
         # set the level resources
         self.level.wood = save_game_as_json_object[self.resourcesVar][self.woodVar]
         self.level.stone = save_game_as_json_object[self.resourcesVar][self.stoneVar]
@@ -341,10 +346,10 @@ class Construction:
         pygame.time.set_timer(Game.construction_event_id, 1000)
         self.level = level
         self.where_to_build = where
-        self.structure = create_structure(structure_name)
         self.time_till_completion = time
 
         self.tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
+        self.structure = create_structure(structure_name)
         self.time = self.structure.build_time
         self.level.wood -= self.structure.build_costs[0]
         self.level.stone -= self.structure.build_costs[1]
@@ -393,7 +398,7 @@ def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
 
 
 def create_structure(shortcut: str):
-    # type: () -> Structures
+    # type: () -> Structures.Structure
     if shortcut == Structures.LumberJack.shortcut or shortcut == Structures.LumberJack.name:
         return Structures.LumberJack()
     elif shortcut == Structures.Quarry.shortcut or shortcut == Structures.Quarry.name:

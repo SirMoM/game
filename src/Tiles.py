@@ -31,8 +31,9 @@ class Tile:
 
     def __str__(self):
         out_str = ""
-        out_str += self.name + " Rel Pos:" + str(self.rel_pos_tuple[0]) + ", " + str(
-            self.rel_pos_tuple[1]) + " Structure: " + self.structure.__str__()
+        out_str += self.name + " Rel Pos: " + str(self.rel_pos_tuple[0]) + ", " + str(
+            self.rel_pos_tuple[1]) + " Structure: " + self.structure.__str__() + " in territory: " + str(
+            self.is_in_territory)
         return out_str
 
     def set_structure(self, structure: Structures.Structure):
