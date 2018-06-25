@@ -20,10 +20,11 @@ class Tile:
     rel_pos_tuple = ()
     is_in_territory = False
     construction: Game.Construction = None
+    green_boarder = os.path.join(parent_dir, "textures/utils/greenBoarder.png")
 
     def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
-        self.tile_pos = tile_pos
         self.name = name
+        self.tile_pos = tile_pos
         self.bg_img = bg_img
         self.img_path = img_path
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)

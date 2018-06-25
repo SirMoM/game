@@ -152,9 +152,13 @@ class Game:
             for tile in row:
                 self.screen.blit(tile.bg_img, tile.tile_pos)
 
+                if tile.is_in_territory:
+                    self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
+
                 # Draw ggf. structures
                 if tile.structure is not None:
                     self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
+
         pygame.display.flip()
 
     def update_windows(self):

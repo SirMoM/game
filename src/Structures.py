@@ -103,9 +103,18 @@ class Castle(Structure):
     def create_territory(self, tile, level: Game.Level):
         self.tile = tile
         self.level = level
-        territory_start = self.tile.rel_pos_tuple
-        for i in territory_start:
-            i -= self.tile_range
+        territory_start = []
+        territory_end = []
+
+        territory_end.append(self.tile.rel_pos_tuple[0] + self.tile_range)
+        territory_end.append(self.tile.rel_pos_tuple[1] + self.tile_range)
+        territory_start.append(self.tile.rel_pos_tuple[0] - self.tile_range)
+        territory_start.append(self.tile.rel_pos_tuple[1] - self.tile_range)
+
+        if territory_end[0] > self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__() - 1:
+            territory_end[0] = self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__() - 1
+        if territory_end[1] > self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__() - 1:
+            territory_end[1] = self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__() - 1
 
         if territory_start[0] < 0:
             territory_start[0] = 0
