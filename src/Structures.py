@@ -93,7 +93,7 @@ class Castle(Structure):
     name = "Castle"
     build_costs = 10, 10, 10
     build_time = 10
-    tile_range = 3
+    tile_range = 2
     tile = None
     level: Game.Level
 
@@ -106,15 +106,15 @@ class Castle(Structure):
         territory_start = []
         territory_end = []
 
-        territory_end.append(self.tile.rel_pos_tuple[0] + self.tile_range)
-        territory_end.append(self.tile.rel_pos_tuple[1] + self.tile_range)
+        territory_end.append(self.tile.rel_pos_tuple[0] + self.tile_range + 1)
+        territory_end.append(self.tile.rel_pos_tuple[1] + self.tile_range + 1)
         territory_start.append(self.tile.rel_pos_tuple[0] - self.tile_range)
         territory_start.append(self.tile.rel_pos_tuple[1] - self.tile_range)
 
-        if territory_end[0] > self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__() - 1:
-            territory_end[0] = self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__() - 1
-        if territory_end[1] > self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__() - 1:
-            territory_end[1] = self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__() - 1
+        if territory_end[0] > self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__():
+            territory_end[0] = self.level.mapAsTileRows[tile.rel_pos_tuple[0]].__len__()
+        if territory_end[1] > self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__():
+            territory_end[1] = self.level.mapAsTileRows[tile.rel_pos_tuple[1]].__len__()
 
         if territory_start[0] < 0:
             territory_start[0] = 0
@@ -122,9 +122,10 @@ class Castle(Structure):
             territory_start[1] = 0
 
         print("territory_start ", territory_start)
+        print("territory_end ", territory_end)
 
-        for i in range(territory_start[0], self.tile.rel_pos_tuple[0] + 3):
-            for j in range(territory_start[1], self.tile.rel_pos_tuple[1] + 3):
+        for i in range(territory_start[0], territory_end[0]):
+            for j in range(territory_start[1], territory_end[1]):
                 self.level.mapAsTileRows[i][j].is_in_territory = True
 
     @staticmethod
