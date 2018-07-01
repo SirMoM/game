@@ -5,6 +5,7 @@ import random
 import sys
 
 import pygame
+import pygbutton
 
 from src import Screens, Tiles, Structures
 from src import config as cfg
@@ -37,10 +38,12 @@ class Level:
 
 class Game:
     running = False
+    show_territory = False
     FPS = 60
     level = None
     windows = []
     songs = []
+    buttons = []
     music_volume = 100
     playtime = 0
     millis = 0
@@ -68,6 +71,8 @@ class Game:
         self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
 
         self.init_bg_music()
+
+        self.buttons.append(pygbutton.PygButton((450, 0, 50, 30), 'T'))
 
     def execute(self):
         pygame.time.set_timer(self.resources_event_id, 1000)
@@ -103,8 +108,8 @@ class Game:
                         self.level.stone += structures.resources_per_loop
                     elif type(structures) is Structures.IronMine:
                         self.level.iron += structures.resources_per_loop
-            if event.type == self.construction_event_id:
 
+            if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
                     print(construction)
                     construction.build_tick()
@@ -124,6 +129,10 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     this = self
                     self.windows.append(Screens.InGameMenu(this))
+
+            for button in self.buttons:
+                if 'click' in button.handleEvent(event):
+                    self.show_territory = not self.show_territory
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -148,11 +157,14 @@ class Game:
 
         self.render_reassures_bar()
 
+        for button in self.buttons:
+            button.draw(self.screen)
+
         for row in level.mapAsTileRows:
             for tile in row:
                 self.screen.blit(tile.bg_img, tile.tile_pos)
 
-                if tile.is_in_territory:
+                if tile.is_in_territory and self.show_territory:
                     self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
 
                 # Draw ggf. structures
