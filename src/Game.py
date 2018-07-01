@@ -383,6 +383,9 @@ class Construction:
         self.level.structures.append(self.structure)
         self.level.constructions.remove(self)
 
+        if type(self.structure) is Structures.Castle:
+            self.structure.create_territory(self.tile, self.level)
+
     def __str__(self):
         return str(self.time_till_completion) + " seconds till completion of the " + self.structure.name
 
