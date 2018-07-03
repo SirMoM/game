@@ -41,7 +41,7 @@ class LumberJack(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.ForestTile.shortcut:
+        if tile.structure is None and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -60,7 +60,7 @@ class Quarry(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.MountainTile.shortcut:
+        if tile.structure is None and tile.shortcut is Tiles.MountainTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -80,7 +80,7 @@ class IronMine(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.MineTile.shortcut:
+        if tile.structure is None and tile.shortcut is Tiles.MineTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False

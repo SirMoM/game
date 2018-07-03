@@ -367,12 +367,17 @@ class Construction:
         self.tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
         self.structure = create_structure(structure_name)
         self.time = self.structure.build_time
-        self.level.wood -= self.structure.build_costs[0]
-        self.level.stone -= self.structure.build_costs[1]
-        self.level.iron -= self.structure.build_costs[2]
 
     def build_tick(self):
-        self.time_till_completion -= 1
+        if (self.level.wood - self.structure.build_costs[0]) >= 0 and (
+                self.level.stone - self.structure.build_costs[1]) >= 0 and (
+                self.level.iron - self.structure.build_costs[2]) >= 0:
+            self.time_till_completion -= 1
+            self.level.wood -= self.structure.build_costs[0]
+            self.level.stone -= self.structure.build_costs[1]
+            self.level.iron -= self.structure.build_costs[2]
+        else:
+            print("Could not work, not enough items")
 
         if self.time_till_completion == 0:
             self.build_done()
@@ -387,7 +392,7 @@ class Construction:
             self.structure.create_territory(self.tile, self.level)
 
     def __str__(self):
-        return str(self.time_till_completion) + " seconds till completion of the " + self.structure.name
+        return str(self.time_till_completion) + " successful workdays till completion of the " + self.structure.name
 
 
 def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):

@@ -52,8 +52,8 @@
     "season": "Winter"
   },
   "resources": {
-    "wood": 15,
-    "stone": 10,
-    "iron": 10
+    "wood": 50,
+    "stone": 30,
+    "iron": 30
   }
 }
