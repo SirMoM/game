@@ -47,6 +47,26 @@ class LumberJack(Structure):
             return False
 
 
+class LumberJackTierTwo(Structure):
+    resources_per_loop = 2.0
+    shortcut = "LJ2"
+    resources_type = "Wood"
+
+    name = "Lumber Jack T2"
+    build_costs = 20, 10, 5
+    build_time = 10
+
+    def __init__(self):
+        self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/lumberJackTII.png"))
+
+    @staticmethod
+    def can_build(tile):
+        if type(tile.structure) is LumberJack and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
+            return True
+        else:
+            return False
+
+
 class Quarry(Structure):
     resources_per_loop = 0.5
     shortcut = "Q"

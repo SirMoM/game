@@ -29,6 +29,7 @@ class TileScreen:
         self.tile_img.create_image(tkinter.TOP, 200, 200)
 
         self.create_overview_frame()
+        self.top_level.focus_force()
 
     def close(self):
         self.is_active = False

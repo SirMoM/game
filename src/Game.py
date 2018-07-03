@@ -101,13 +101,17 @@ class Game:
         for event in pygame.event.get():
             if event.type == self.resources_event_id:
                 pygame.time.set_timer(self.resources_event_id, 1000)
-                for structures in self.level.structures:
-                    if type(structures) is Structures.LumberJack:
-                        self.level.wood += structures.resources_per_loop
-                    elif type(structures) is Structures.Quarry:
-                        self.level.stone += structures.resources_per_loop
-                    elif type(structures) is Structures.IronMine:
-                        self.level.iron += structures.resources_per_loop
+                for structure in self.level.structures:
+                    if type(structure) is Structures.LumberJack:
+                        self.level.wood += structure.resources_per_loop
+                        print(self.level.wood)
+                    if type(structure) is Structures.LumberJackTierTwo:
+                        self.level.wood += structure.resources_per_loop
+                        print(self.level.wood)
+                    elif type(structure) is Structures.Quarry:
+                        self.level.stone += structure.resources_per_loop
+                    elif type(structure) is Structures.IronMine:
+                        self.level.iron += structure.resources_per_loop
 
             if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
@@ -383,6 +387,9 @@ class Construction:
             self.build_done()
 
     def build_done(self):
+        if self.tile.structure is not None:
+            self.level.structures.remove(self.tile.structure)
+
         self.tile.structure = self.structure
         self.tile.construction = None
         self.level.structures.append(self.structure)
@@ -425,6 +432,8 @@ def create_structure(shortcut: str):
     # type: () -> Structures.Structure
     if shortcut == Structures.LumberJack.shortcut or shortcut == Structures.LumberJack.name:
         return Structures.LumberJack()
+    if shortcut == Structures.LumberJackTierTwo.shortcut or shortcut == Structures.LumberJackTierTwo.name:
+        return Structures.LumberJackTierTwo()
     elif shortcut == Structures.Quarry.shortcut or shortcut == Structures.Quarry.name:
         return Structures.Quarry()
     elif shortcut == Structures.IronMine.shortcut or shortcut == Structures.IronMine.name:
