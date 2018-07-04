@@ -69,6 +69,8 @@ class Game:
         self.screen.fill(ColorRGB.grey)
 
         self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
+        self.boxy_bold_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 20)
+        self.thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
 
         self.init_bg_music()
 
@@ -188,13 +190,13 @@ class Game:
         if self.level.wood >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
             str_anz_wood = ": %.f" % self.level.wood
-            text_surface = self.comic_sans_30.render(str_anz_wood, False, (0, 0, 0))
-            self.screen.blit(text_surface, (52, 5))
+            text_surface = self.boxy_bold_20.render(str_anz_wood, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 15))
 
         if self.level.stone >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
             str_anz_stone = ": %.f" % self.level.stone
-            text_surface = self.comic_sans_30.render(str_anz_stone, False, (0, 0, 0))
+            text_surface = self.thor_20.render(str_anz_stone, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 42))
 
         if self.level.iron >= 1:
@@ -215,6 +217,7 @@ class Game:
         pygame.mixer.music.set_volume(float(volume))
         if not pygame.mixer.music.get_busy():
             self.current_song_id = random.randint(0, self.songs.__len__() - 1)
+            print(self.songs[self.current_song_id])
             pygame.mixer.music.load(self.songs[self.current_song_id])
             pygame.mixer.music.play()
 
@@ -372,6 +375,9 @@ class Construction:
         self.structure = create_structure(structure_name)
         self.time = self.structure.build_time
 
+        self.hammering = pygame.mixer.Sound(os.path.join(parent_dir, "sounds/music/Glorious_Morning_Waterflame.mp3"))
+        self.hammering.play(loops=-1)
+
     def build_tick(self):
         if (self.level.wood - self.structure.build_costs[0]) >= 0 and (
                 self.level.stone - self.structure.build_costs[1]) >= 0 and (
@@ -394,6 +400,8 @@ class Construction:
         self.tile.construction = None
         self.level.structures.append(self.structure)
         self.level.constructions.remove(self)
+
+        self.hammering.stop()
 
         if type(self.structure) is Structures.Castle:
             self.structure.create_territory(self.tile, self.level)
