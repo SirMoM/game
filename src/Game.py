@@ -375,8 +375,9 @@ class Construction:
         self.structure = create_structure(structure_name)
         self.time = self.structure.build_time
 
-        self.hammering = pygame.mixer.Sound(os.path.join(parent_dir, "sounds/music/Glorious_Morning_Waterflame.mp3"))
-        self.hammering.play(loops=-1)
+        self.hammering = pygame.mixer.Sound(os.path.join(parent_dir, "sounds/effects/hammering.wav"))
+        self.hammering.play(1, fade_ms=1000)
+
 
     def build_tick(self):
         if (self.level.wood - self.structure.build_costs[0]) >= 0 and (
@@ -401,7 +402,7 @@ class Construction:
         self.level.structures.append(self.structure)
         self.level.constructions.remove(self)
 
-        self.hammering.stop()
+        self.hammering.fadeout(1000)
 
         if type(self.structure) is Structures.Castle:
             self.structure.create_territory(self.tile, self.level)
