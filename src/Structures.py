@@ -111,7 +111,7 @@ class Castle(Structure):
     resources_type = ""
     shortcut = "C"
     name = "Castle"
-    build_costs = 10, 10, 10
+    build_costs = 5, 5, 5
     build_time = 10
     tile_range = 2
     tile = None

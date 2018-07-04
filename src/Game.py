@@ -365,14 +365,14 @@ class LevelWriter(object):
 
 
 class Construction:
-    def __init__(self, level, where: tuple, structure_name, time: int):
+    def __init__(self, level, where: tuple, structure_name):
         pygame.time.set_timer(Game.construction_event_id, 1000)
         self.level = level
         self.where_to_build = where
-        self.time_till_completion = time
 
         self.tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
         self.structure = create_structure(structure_name)
+        self.time_till_completion = self.structure.build_time
         self.time = self.structure.build_time
 
         self.hammering = pygame.mixer.Sound(os.path.join(parent_dir, "sounds/effects/hammering.wav"))

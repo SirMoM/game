@@ -134,7 +134,7 @@ class TileScreen:
         if listbox.curselection().__len__() > 0:
             print("Building", listbox.get(listbox.curselection()[0]))
             self.tile.construction = Game.Construction(self.level, self.tile.rel_pos_tuple,
-                                                       listbox.get(listbox.curselection()[0]), 3)
+                                                       listbox.get(listbox.curselection()[0]))
             self.level.constructions.append(self.tile.construction)
             self.back_to_main_frame()
 
