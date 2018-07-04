@@ -72,10 +72,9 @@ class ForestTile(Tile):
     name = "Forrest"
     img_path = os.path.join(parent_dir, "textures/tiles/forestTile.png")
 
-
     def __init__(self, tile_pos, rel_pos):
         self.img_path = random.choice([os.path.join(parent_dir, "textures/tiles/forestTile.png"),
-                                       os.path.join(parent_dir, "textures/tiles/forestTilev2.png")])
+                                       os.path.join(parent_dir, "textures/tiles/forestTile2.png")])
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
@@ -114,5 +113,5 @@ class MountainTile(Tile):
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
-        self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 16)
+        self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1])
         self.rel_pos_tuple = rel_pos
