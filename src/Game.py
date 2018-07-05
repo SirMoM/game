@@ -172,8 +172,9 @@ class Game:
         for row in level.mapAsTileRows:
             for tile in row:
 
+                #TODO BUT WHY ????  komische reinfolge
                 render_destination = (
-                (tile.rel_pos_tuple[0] * 33) + self.x_offset, (tile.rel_pos_tuple[1] * 33) + self.y_offset)
+                (tile.rel_pos_tuple[1] * 33) + self.y_offset, (tile.rel_pos_tuple[0] * 33) + self.x_offset)
 
                 tile.set_new_pos(render_destination)
 
