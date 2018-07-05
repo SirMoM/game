@@ -10,10 +10,11 @@ from src.Utilities import ColorHex
 
 class TileScreen:
 
-    def __init__(self, level, tile: Tiles.Tile):
+    def __init__(self, game: Game.Game, tile: Tiles.Tile):
         print(tile)
 
-        self.level = level
+        self.game = game
+        self.level = game.level
         self.tile = tile
         self.is_active = True
 
@@ -133,7 +134,7 @@ class TileScreen:
     def build(self, listbox: tkinter.Listbox):
         if listbox.curselection().__len__() > 0:
             print("Building", listbox.get(listbox.curselection()[0]))
-            self.tile.construction = Game.Construction(self.level, self.tile.rel_pos_tuple,
+            self.tile.construction = Game.Construction(self.game, self.tile.rel_pos_tuple,
                                                        listbox.get(listbox.curselection()[0]))
             self.level.constructions.append(self.tile.construction)
             self.back_to_main_frame()
@@ -365,15 +366,22 @@ class OptionFrame(tkinter.Frame):
         self.game = game
         super().__init__(master)
         self.pack(fill=tkinter.BOTH, expand=True)
-        create_label(self.pack(), "Volume: ", 50, 100, bg_color=ColorHex.white)
-        self.scale = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
-        self.scale.set((float(cfg.get_value(cfg.sound_section, cfg.music_volume_option)) * 100))
-        self.scale.place(x=50, y=120)
+        create_label(self.pack(), "Volume: ", 50, 50, bg_color=ColorHex.white)
+        self.scale_music_vol = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
+        self.scale_music_vol.set((float(cfg.get_value(cfg.sound_section, cfg.music_volume_option)) * 100))
+        self.scale_music_vol.place(x=50, y=70)
+
+        create_label(self.pack(), "Sound effects: ", 50, 150, bg_color=ColorHex.white)
+        self.scale_effects_vol = tkinter.Scale(self.pack(), length=300, tickinterval=10, from_=0, to=100, orient=tkinter.HORIZONTAL)
+        self.scale_effects_vol.set((float(cfg.get_value(cfg.sound_section, cfg.sfx_volume_option)) * 100))
+        self.scale_effects_vol.place(x=50, y=170)
 
         create_button(self.pack(), "Save options", self.save_options, 100, 300)
 
     def save_options(self):
-        cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale.get() / 100))
+        cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale_music_vol.get() / 100))
+        cfg.set_value(cfg.sound_section, cfg.sfx_volume_option, str(self.scale_effects_vol.get() / 100))
+
         if self.game is not None:
             self.game.load_settings()
 

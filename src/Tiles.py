@@ -21,6 +21,8 @@ class Tile:
     rel_pos_tuple = ()
     is_in_territory = False
     construction: Game.Construction = None
+    x_offset : int = 16
+    y_offset : int = 16
     green_boarder = os.path.join(parent_dir, "textures/utils/greenBoarder.png")
 
     def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
@@ -45,6 +47,10 @@ class Tile:
     def get_structure(self) -> Structures:
         return self.structure
 
+    def set_new_pos(self, tile_pos):
+        self.tile_pos = tile_pos
+        self.associated_structure_pos = (tile_pos[0] + self.x_offset, tile_pos[1] + self.y_offset)
+
     def is_point_in_tile(self, xPos, yPos):
         if self.tile_pos[0] + 32 > xPos > self.tile_pos[0]:
             if self.tile_pos[1] + 32 > yPos > self.tile_pos[1]:
@@ -59,6 +65,8 @@ class NormalTile(Tile):
     shortcut = "N"
     name = "Normal Ground"
     img_path = os.path.join(parent_dir, "textures/tiles/normTile.png")
+    x_offset: int = 0
+    y_offset: int = 0
 
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -85,6 +93,8 @@ class MineTile(Tile):
     shortcut = "PM"  # Potential Mine
     name = "Mine"
     img_path = os.path.join(parent_dir, "textures/tiles/mineTile.png")
+    x_offset: int = 8
+    y_offset: int = 8
 
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)
@@ -109,6 +119,9 @@ class MountainTile(Tile):
     shortcut = "M"
     name = "Mountain"
     img_path = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
+    x_offset: int = 8
+    y_offset: int = 0
+
 
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)

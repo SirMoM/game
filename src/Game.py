@@ -37,6 +37,10 @@ class Level:
 
 
 class Game:
+    width = 1000
+    height = 1000
+    x_offset = 200
+    y_offset = 100
     running = False
     show_territory = False
     FPS = 60
@@ -44,7 +48,8 @@ class Game:
     windows = []
     songs = []
     buttons = []
-    music_volume = 100
+    music_volume = None
+    effects_volume = None
     playtime = 0
     millis = 0
     resources_event_id = 25
@@ -65,16 +70,16 @@ class Game:
 
         pygame.display.set_icon(pygame.image.load(self.game_icon))
 
-        self.screen = pygame.display.set_mode((500, 500))
+        self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.fill(ColorRGB.grey)
 
         self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
-        self.boxy_bold_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 20)
+        self.boxy_bold_25 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 25)
         self.thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
 
         self.init_bg_music()
 
-        self.buttons.append(pygbutton.PygButton((450, 0, 50, 30), 'T'))
+        self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
 
     def execute(self):
         pygame.time.set_timer(self.resources_event_id, 1000)
@@ -128,7 +133,7 @@ class Game:
                     for row in self.level.mapAsTileRows:
                         for tile in row:
                             if tile.is_point_in_tile(xPos, yPos):
-                                tile_screen = Screens.TileScreen(self.level, tile)
+                                tile_screen = Screens.TileScreen(self, tile)
                                 self.windows.append(tile_screen)
 
             if event.type == pygame.KEYDOWN:
@@ -161,14 +166,18 @@ class Game:
 
         self.update_windows()
 
-        self.render_reassures_bar()
-
         for button in self.buttons:
             button.draw(self.screen)
 
         for row in level.mapAsTileRows:
             for tile in row:
-                self.screen.blit(tile.bg_img, tile.tile_pos)
+
+                render_destination = (
+                (tile.rel_pos_tuple[0] * 33) + self.x_offset, (tile.rel_pos_tuple[1] * 33) + self.y_offset)
+
+                tile.set_new_pos(render_destination)
+
+                self.screen.blit(tile.bg_img, render_destination)
 
                 if tile.is_in_territory and self.show_territory:
                     self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
@@ -177,6 +186,7 @@ class Game:
                 if tile.structure is not None:
                     self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
 
+        self.render_reassures_bar()
         pygame.display.flip()
 
     def update_windows(self):
@@ -187,22 +197,23 @@ class Game:
                 self.windows.remove(window)
 
     def render_reassures_bar(self):
+        absand = 32 + 8
         if self.level.wood >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
             str_anz_wood = ": %.f" % self.level.wood
-            text_surface = self.boxy_bold_20.render(str_anz_wood, False, (0, 0, 0))
+            text_surface = self.boxy_bold_25.render(str_anz_wood, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 15))
 
         if self.level.stone >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
             str_anz_stone = ": %.f" % self.level.stone
-            text_surface = self.thor_20.render(str_anz_stone, False, (0, 0, 0))
+            text_surface = self.boxy_bold_25.render(str_anz_stone, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 42))
 
         if self.level.iron >= 1:
             self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/iron.png")), (10, 74))
             str_anz_iron = ": %.f" % self.level.iron
-            text_surface = self.comic_sans_30.render(str_anz_iron, False, (0, 0, 0))
+            text_surface = self.boxy_bold_25.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
 
     def close(self):
@@ -227,6 +238,7 @@ class Game:
 
     def load_settings(self):
         self.music_volume = cfg.get_value(cfg.sound_section, cfg.music_volume_option)
+        self.effects_volume = cfg.get_value(cfg.sound_section, cfg.sfx_volume_option)
 
 
 class LevelParser:
@@ -264,15 +276,15 @@ class LevelParser:
 
         self.level = Level()
 
-        pos_y = 40
-        pos_x = 100
+        pos_y = Game.y_offset
+        pos_x = Game.y_offset
 
         for row_index in range(0, self.mapAsRowArray.__len__()):
-            pos_y += 40
+            pos_y += 33
             temp_array = []
             temp_array.clear()
             for tile_shortcut_index in range(0, self.mapAsRowArray[row_index].__len__()):
-                pos_x += 40
+                pos_x += 33
                 if self.structuresAsRowArray:
                     temp_structure = create_structure(self.structuresAsRowArray[row_index][tile_shortcut_index])
                     temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
@@ -286,7 +298,7 @@ class LevelParser:
             for tile in temp_array:
                 print(tile)
 
-            pos_x = 100
+            pos_x = Game.x_offset
             self.level.mapAsTileRows.append(temp_array)
 
         for row in self.level.mapAsTileRows:
@@ -365,9 +377,9 @@ class LevelWriter(object):
 
 
 class Construction:
-    def __init__(self, level, where: tuple, structure_name):
+    def __init__(self, game: Game, where: tuple, structure_name):
         pygame.time.set_timer(Game.construction_event_id, 1000)
-        self.level = level
+        self.level = game.level
         self.where_to_build = where
 
         self.tile = self.level.mapAsTileRows[self.where_to_build[0]][self.where_to_build[1]]
@@ -376,8 +388,8 @@ class Construction:
         self.time = self.structure.build_time
 
         self.hammering = pygame.mixer.Sound(os.path.join(parent_dir, "sounds/effects/hammering.wav"))
-        self.hammering.play(1, fade_ms=1000)
-
+        self.hammering.set_volume(float(game.effects_volume))
+        self.hammering.play(-1)
 
     def build_tick(self):
         if (self.level.wood - self.structure.build_costs[0]) >= 0 and (
