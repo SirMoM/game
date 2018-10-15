@@ -2,17 +2,34 @@ import inspect
 import os
 import sys
 import tkinter
+import logging
 
 from src import Tiles, Game, Structures
 from src import config as cfg
 from src.Utilities import ColorHex
 
+parent_dir = os.path.dirname(os.getcwd())
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler(os.path.join(os.path.dirname(os.getcwd()), "logs/GameLog.log"))
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
+
 
 class TileScreen:
 
     def __init__(self, game: Game.Game, tile: Tiles.Tile):
-        print(tile)
-
+        logger.debug("Opend a Tile screen with a" + tile.__str__() + "Tile")
         self.game = game
         self.level = game.level
         self.tile = tile
@@ -133,7 +150,8 @@ class TileScreen:
 
     def build(self, listbox: tkinter.Listbox):
         if listbox.curselection().__len__() > 0:
-            print("Building", listbox.get(listbox.curselection()[0]))
+            logger.debug("Building " + listbox.get(listbox.curselection()[0]))
+
             self.tile.construction = Game.Construction(self.game, self.tile.rel_pos_tuple,
                                                        listbox.get(listbox.curselection()[0]))
             self.level.constructions.append(self.tile.construction)
@@ -190,11 +208,13 @@ class InGameMenu:
         self.options.pack()
         back_button = GuiFactoryPack.button("Back", self.back_to_main_frame, master=self.options)
         back_button.pack(side=tkinter.BOTTOM)
+        logger.info("Opened Options")
 
     def close(self):
         self.is_active = False
         self.game.pause = False
         self.root.destroy()
+        logger.info("Opened Options")
 
     def open_main_menu(self):
         self.close()
@@ -274,13 +294,15 @@ class MainMenu:
         self.root.attributes("-topmost", True)
 
         self.main_menu_components()
+        logger.info("Started Main Menue")
 
     def options(self):
-        print("Options")
+        logger.info("Opened Options from Main Menu")
         self.main_frame.destroy()
         self.option_frame = OptionFrame(self.root)
         create_button(self.option_frame.pack(), "Back", self.back_to_myself, 200, 300)
         self.option_frame.pack()
+        logger.info("Opened Options")
 
     def back_to_myself(self):
         for ele in self.root.winfo_children():
@@ -305,7 +327,7 @@ class MainMenu:
         close_button.grid(row=3, column=3)
 
     def load_game(self):
-        print("Load Game")
+        logger.info("Load Game")
         self.main_frame.destroy()
 
         parent_dir = os.path.dirname(os.getcwd())
@@ -322,7 +344,7 @@ class MainMenu:
         create_button(self.load_game_sub_frame, "Back", self.back_to_myself, 200, 300)
 
     def new_game(self):
-        print("New game")
+        logger.info("New Game")
         self.main_frame.destroy()
         self.new_game_sub_frame = tkinter.Frame(self.root).pack()
 
@@ -347,11 +369,16 @@ class MainMenu:
 
     def start_game(self, map_to_load: str):
         self.root.destroy()
-        map = map_to_load
-        print(map)
-        level = Game.LevelParser(map).get_level()
-        new_game = Game.Game()
-        new_game.level = level
+        logger.info("Start Game")
+        map_path = map_to_load
+        logger.info("The map_path to load is " + map_path)
+
+        level = Game.LevelParser(map_path).get_level()
+
+        logger.debug("The loaded Level is " + level.__str__())
+
+        new_game = Game.Game(level)
+       #new_game.level = level
         new_game.execute()
 
     def make_game_saves_widget(self, save_path, file):
