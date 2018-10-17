@@ -81,6 +81,7 @@ class Game:
         pygame.font.init()
         pygame.init()
 
+        pygame.key.set_repeat(75, 25)
         self.level = level
 
         self.load_settings()
@@ -149,6 +150,7 @@ class Game:
                     elif type(structure) is Structures.IronMine:
                         self.level.iron += structure.resources_per_loop
                         logger.info("Iron added: " + self.level.iron.__str__())
+
             if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
                     #logger.info(construction)
@@ -169,6 +171,18 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     this = self
                     self.windows.append(Screens.InGameMenu(this))
+
+                if event.key == pygame.K_w:
+                    self.renderer.move_map_up()
+
+                if event.key == pygame.K_s:
+                    self.renderer.move_map_down()
+
+                if event.key == pygame.K_a:
+                    self.renderer.move_map_left()
+
+                if event.key == pygame.K_d:
+                    self.renderer.move_map_right()
 
             for button in self.buttons:
                 if 'click' in button.handleEvent(event):
