@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 import os
 import random
 import sys
-import logging
 
 import pygame
 import pygbutton
@@ -31,6 +31,7 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
+
 class Level:
     mapAsTileRows = []
     structures = []
@@ -44,7 +45,7 @@ class Level:
         return resources_str
 
     def __str__(self):
-        #TODO Do it right so someone can understand this output
+        # TODO Do it right so someone can understand this output
 
         str_names = ""
         for row in self.mapAsTileRows:
@@ -82,8 +83,6 @@ class Game:
 
         self.level = level
 
-
-
         self.load_settings()
 
         self.running = True
@@ -102,6 +101,11 @@ class Game:
         self.init_bg_music()
 
         self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
+
+        self.buttons.append(pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
+        self.buttons.append(pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
+        self.buttons.append(pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
+        self.buttons.append(pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
 
         self.renderer: GameRender = GameRender(self.level, self.screen)
 
@@ -135,25 +139,25 @@ class Game:
                 for structure in self.level.structures:
                     if type(structure) is Structures.LumberJack:
                         self.level.wood += structure.resources_per_loop
-                        logger.debug("Wood addes: " + self.level.wood)
+                        logger.info("Wood addes: " + self.level.wood.__str__())
                     if type(structure) is Structures.LumberJackTierTwo:
                         self.level.wood += structure.resources_per_loop
-                        logger.debug("Wood added: " + self.level.wood)
+                        logger.info("Wood added: " + self.level.wood.__str__())
                     elif type(structure) is Structures.Quarry:
                         self.level.stone += structure.resources_per_loop
-                        logger.debug("Stone added: " + self.level.stone)
+                        logger.info("Stone added: " + self.level.stone.__str__())
                     elif type(structure) is Structures.IronMine:
                         self.level.iron += structure.resources_per_loop
-                        logger.debug("Iron added: " + self.level.iron)
+                        logger.info("Iron added: " + self.level.iron.__str__())
             if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
-                    logger.info(construction)
+                    #logger.info(construction)
                     construction.build_tick()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     xPos, yPos = pygame.mouse.get_pos()
-                    logger.debug("Clicked at: " + xPos.__str__() + " ," + yPos.__str__())
+                    logger.info("Clicked at: " + xPos.__str__() + " ," + yPos.__str__())
 
                     for row in self.level.mapAsTileRows:
                         for tile in row:
@@ -168,7 +172,19 @@ class Game:
 
             for button in self.buttons:
                 if 'click' in button.handleEvent(event):
-                    self.show_territory = not self.show_territory
+
+                    if button._propGetCaption() is "T":
+                        self.renderer.toggle_territory_visibility()
+                    if button._propGetCaption() is "^":
+                        self.renderer.move_map_up()
+                    if button._propGetCaption() is "v":
+                        self.renderer.move_map_down()
+                    if button._propGetCaption() is "<":
+                        self.renderer.move_map_left()
+                    if button._propGetCaption() is ">":
+                        self.renderer.move_map_right()
+                    else:
+                        logger.info("button: " + button._caption)
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -185,7 +201,7 @@ class Game:
     def render_on_loop(self, level: Level):
 
         self.screen.fill(ColorRGB.grey)
-        str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
+        str_caption = "Gloria! \t \t %.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
 
         self.update_windows()
@@ -193,25 +209,9 @@ class Game:
         for button in self.buttons:
             button.draw(self.screen)
 
-        for row in level.mapAsTileRows:
-            for tile in row:
+        self.renderer.levelToRender = level
+        self.renderer.render()
 
-                # TODO BUT WHY ????  komische reinfolge
-                render_destination = (
-                    (tile.rel_pos_tuple[1] * 33) + self.y_offset, (tile.rel_pos_tuple[0] * 33) + self.x_offset)
-
-                tile.set_new_pos(render_destination)
-
-                self.screen.blit(tile.bg_img, render_destination)
-
-                if tile.is_in_territory and self.show_territory:
-                    self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
-
-                # Draw ggf. structures
-                if tile.structure is not None:
-                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
-
-        self.render_reassures_bar()
         pygame.display.flip()
 
     def update_windows(self):
@@ -220,9 +220,6 @@ class Game:
                 window.update()
             else:
                 self.windows.remove(window)
-
-    def render_reassures_bar(self):
-        self.renderer.resource_bar()
 
     def close(self):
         self.running = False
@@ -405,7 +402,7 @@ class Construction:
             self.level.stone -= self.structure.build_costs[1]
             self.level.iron -= self.structure.build_costs[2]
         else:
-            logger.debug("Could not work, not enough resources")
+            logger.info("Could not work, not enough resources")
 
         if self.time_till_completion == 0:
             self.build_done()
@@ -472,8 +469,14 @@ def create_structure(shortcut: str):
 
 class GameRender:
     show_territory: bool = False
-    y_start_rendering_pos: int = 100
-    x_start_rendering_pos: int = 100
+    y_rendering_pos: int = 0
+    x_rendering_pos: int = 0
+
+    y_anchor_pos: int = 250
+    x_anchor_pos: int = 200
+
+    y_offset: int = 33
+    x_offset: int = 33
 
     resource_boarder_gap: int = 150
 
@@ -482,15 +485,35 @@ class GameRender:
     thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
 
     def __init__(self, level: Level, screen):
+        logger.info("DAS IST EIN TEST info DAS SOLLTE FUNSEN")
         self.levelToRender = level
         self.screen = screen
-        logger.info(self.levelToRender)
 
     def toggle_territory_visibility(self):
         self.show_territory = not self.show_territory
 
     def render(self):
         self.resource_bar()
+        self.render_map()
+
+    def render_map(self):
+
+        for row in self.levelToRender.mapAsTileRows:
+            for tile in row:
+                self.y_rendering_pos = tile.rel_pos_tuple[0] * self.y_offset + self.y_anchor_pos
+                self.x_rendering_pos = tile.rel_pos_tuple[1] * self.x_offset + self.x_anchor_pos
+
+                logger.debug(("y_rendering_pos", self.y_rendering_pos, "x_rendering_pos", self.x_rendering_pos))
+
+                tile.set_new_pos((self.x_rendering_pos, self.y_rendering_pos))
+                self.screen.blit(tile.bg_img, (self.x_rendering_pos, self.y_rendering_pos))
+
+                if tile.is_in_territory is True and self.show_territory is True:
+                    self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
+
+                # Draw ggf. structures
+                if tile.structure is not None:
+                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
 
     def resource_bar(self):
         if self.levelToRender.wood >= 1:
@@ -510,3 +533,15 @@ class GameRender:
             str_anz_iron = ": %.f" % self.levelToRender.iron
             text_surface = self.boxy_bold_25.render(str_anz_iron, False, (0, 0, 0))
             self.screen.blit(text_surface, (52, 74))
+
+    def move_map_up(self):
+        self.y_anchor_pos -= 25
+
+    def move_map_down(self):
+        self.y_anchor_pos += 25
+
+    def move_map_left(self):
+        self.x_anchor_pos -= 25
+
+    def move_map_right(self):
+        self.x_anchor_pos += 25

@@ -208,13 +208,13 @@ class InGameMenu:
         self.options.pack()
         back_button = GuiFactoryPack.button("Back", self.back_to_main_frame, master=self.options)
         back_button.pack(side=tkinter.BOTTOM)
-        logger.info("Opened Options")
+        logger.info("Opened Options from the ingame-Menue ")
 
     def close(self):
         self.is_active = False
         self.game.pause = False
         self.root.destroy()
-        logger.info("Opened Options")
+        logger.info("Close ingame menue")
 
     def open_main_menu(self):
         self.close()
