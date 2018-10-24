@@ -102,17 +102,7 @@ class Game:
         self.screen.fill(ColorRGB.grey)
 
         self.init_bg_music()
-
-        self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
-
-        self.buttons.append(
-            pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
-        self.buttons.append(
-            pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
-        self.buttons.append(
-            pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
-        self.buttons.append(
-            pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
+        self.init_buttons()
 
         self.renderer: GameRender = GameRender(self.level, self.screen)
 
@@ -207,7 +197,15 @@ class Game:
                         logger.info("button: " + button._caption)
 
             if event.type == pygame.VIDEORESIZE:
-                pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                old_width, old_height = self.width, self.height
+                self.width = event.w
+                self.height = event.h
+                dif_width, dif_height = self.width - old_width, self.height - old_height
+                pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+
+                for button in self.buttons:
+                    newrect = button._propGetRect().move(dif_width, dif_height)
+                    button._propSetRect(newrect)
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -237,7 +235,6 @@ class Game:
         self.renderer.render()
 
         pygame.display.flip()
-
 
     def update_windows(self):
         for window in self.windows:
@@ -285,6 +282,18 @@ class Game:
             surface.blit(old_surface_saved, (0, 0))
             del old_surface_saved
     '''
+
+    def init_buttons(self):
+        self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
+
 
 class LevelParser:
     mapVar = "map"
