@@ -206,6 +206,9 @@ class Game:
                     else:
                         logger.info("button: " + button._caption)
 
+            if event.type == pygame.VIDEORESIZE:
+                pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
                 self.running = False
@@ -233,9 +236,8 @@ class Game:
         # self.renderer.levelToRender = level
         self.renderer.render()
 
-        self.update_pygame_screen()
-
         pygame.display.flip()
+
 
     def update_windows(self):
         for window in self.windows:
@@ -270,11 +272,19 @@ class Game:
         self.music_volume = cfg.get_value(cfg.sound_section, cfg.music_volume_option)
         self.effects_volume = cfg.get_value(cfg.sound_section, cfg.sfx_volume_option)
 
+    '''
     def update_pygame_screen(self):
-        self.width, self.height = pygame.display.Info().current_w, pygame.display.Info().current_h
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
         pygame.display.update()
+        self.screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h), pygame.RESIZABLE)
 
+        old_surface_saved = surface
+            surface = pygame.display.set_mode((event.w, event.h),
+                                              pygame.RESIZABLE)
+            # On the next line, if only part of the window
+            # needs to be copied, there's some other options.
+            surface.blit(old_surface_saved, (0, 0))
+            del old_surface_saved
+    '''
 
 class LevelParser:
     mapVar = "map"
