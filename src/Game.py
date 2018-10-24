@@ -92,21 +92,27 @@ class Game:
 
         pygame.display.set_icon(pygame.image.load(self.game_icon))
 
+        # self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+
         self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
         self.boxy_bold_25 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 25)
         self.thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.fill(ColorRGB.grey)
 
         self.init_bg_music()
 
         self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
 
-        self.buttons.append(pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
-        self.buttons.append(pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
-        self.buttons.append(pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
-        self.buttons.append(pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
 
         self.renderer: GameRender = GameRender(self.level, self.screen)
 
@@ -153,7 +159,7 @@ class Game:
 
             if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
-                    #logger.info(construction)
+                    # logger.info(construction)
                     construction.build_tick()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -220,11 +226,14 @@ class Game:
 
         self.update_windows()
 
+        # TODO redo the buttons in the Randerer Class
         for button in self.buttons:
             button.draw(self.screen)
 
-        self.renderer.levelToRender = level
+        # self.renderer.levelToRender = level
         self.renderer.render()
+
+        self.update_pygame_screen()
 
         pygame.display.flip()
 
@@ -252,12 +261,19 @@ class Game:
             pygame.mixer.music.play()
 
     def init_bg_music(self):
+        # TODO Auto scan  the musik library
+        # TODO add more musik ?
         self.songs.append(os.path.join(parent_dir, "sounds/music/Glorious_Morning_Waterflame.mp3"))
-        # add more musik ?
+        self.songs.append(os.path.join(parent_dir, "sounds/music/Mid-Air_Machine_-_Untamed_Wings.mp3"))
 
     def load_settings(self):
         self.music_volume = cfg.get_value(cfg.sound_section, cfg.music_volume_option)
         self.effects_volume = cfg.get_value(cfg.sound_section, cfg.sfx_volume_option)
+
+    def update_pygame_screen(self):
+        self.width, self.height = pygame.display.Info().current_w, pygame.display.Info().current_h
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        pygame.display.update()
 
 
 class LevelParser:
@@ -507,11 +523,10 @@ class GameRender:
         self.show_territory = not self.show_territory
 
     def render(self):
-        self.resource_bar()
         self.render_map()
+        self.resource_bar()
 
     def render_map(self):
-
         for row in self.levelToRender.mapAsTileRows:
             for tile in row:
                 self.y_rendering_pos = tile.rel_pos_tuple[0] * self.y_offset + self.y_anchor_pos
