@@ -1,11 +1,26 @@
 import os
 import random
-
 import pygame
+
+import logging
 
 from src import Structures, Game
 
 parent_dir = os.path.dirname(os.getcwd())
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler(os.path.join(os.path.dirname(os.getcwd()), "logs/GameLog.log"))
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
 
 
 class Tile:
@@ -33,11 +48,10 @@ class Tile:
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
 
+        logger.debug("Just created a " + self.name)
+
     def __str__(self):
-        out_str = ""
-        out_str += self.name + " Rel Pos: " + str(self.rel_pos_tuple[0]) + ", " + str(
-            self.rel_pos_tuple[1]) + " Structure: " + self.structure.__str__() + " in territory: " + str(
-            self.is_in_territory)
+        out_str = self.name
         return out_str
 
     def set_structure(self, structure: Structures.Structure):
@@ -74,6 +88,8 @@ class NormalTile(Tile):
         self.associated_structure_pos = (tile_pos[0], tile_pos[1])
         self.rel_pos_tuple = rel_pos
 
+        logger.debug("Just created a " + self.name)
+
 
 class ForestTile(Tile):
     shortcut = "F"
@@ -87,6 +103,7 @@ class ForestTile(Tile):
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
+        logger.debug("Just created a " + self.name)
 
 
 class MineTile(Tile):
@@ -102,6 +119,8 @@ class MineTile(Tile):
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 8)
         self.rel_pos_tuple = rel_pos
 
+        logger.debug("Just created a " + self.name)
+
 
 class LakeTile(Tile):
     shortcut = "L"
@@ -114,6 +133,8 @@ class LakeTile(Tile):
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
 
+        logger.debug("Just created a " + self.name)
+
 
 class MountainTile(Tile):
     shortcut = "M"
@@ -122,9 +143,10 @@ class MountainTile(Tile):
     x_offset: int = 8
     y_offset: int = 0
 
-
     def __init__(self, tile_pos, rel_pos):
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1])
         self.rel_pos_tuple = rel_pos
+
+        logger.debug("Just created a " + self.name)

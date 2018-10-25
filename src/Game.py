@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import logging
 import os
 import random
 import sys
@@ -16,6 +17,20 @@ __version__ = "0.1"
 
 parent_dir = os.path.dirname(os.getcwd())
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler(os.path.join(parent_dir, "logs/GameLog.log"))
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
 
 class Level:
     mapAsTileRows = []
@@ -30,9 +45,13 @@ class Level:
         return resources_str
 
     def __str__(self):
-        str_names = ""  # type: str
+        # TODO Do it right so someone can understand this output
+
+        str_names = ""
         for row in self.mapAsTileRows:
-            str_names += row.name + ", "
+            for tile in row:
+                str_names += tile.__str__() + ", "
+            str_names += "\n"
         return str_names
 
 
@@ -56,11 +75,14 @@ class Game:
     construction_event_id = 26
     game_icon = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
 
-    def __init__(self):
-        print("New Game")
+    def __init__(self, level: Level):
+        logger.info("NEW GAME")
         pygame.mixer.init()
         pygame.font.init()
         pygame.init()
+
+        pygame.key.set_repeat(75, 25)
+        self.level = level
 
         self.load_settings()
 
@@ -70,16 +92,19 @@ class Game:
 
         pygame.display.set_icon(pygame.image.load(self.game_icon))
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        self.screen.fill(ColorRGB.grey)
+        # self.screen = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
 
         self.comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
         self.boxy_bold_25 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 25)
         self.thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
 
-        self.init_bg_music()
+        self.screen.fill(ColorRGB.grey)
 
-        self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
+        self.init_bg_music()
+        self.init_buttons()
+
+        self.renderer: GameRender = GameRender(self.level, self.screen)
 
     def execute(self):
         pygame.time.set_timer(self.resources_event_id, 1000)
@@ -111,24 +136,26 @@ class Game:
                 for structure in self.level.structures:
                     if type(structure) is Structures.LumberJack:
                         self.level.wood += structure.resources_per_loop
-                        print(self.level.wood)
+                        logger.info("Wood addes: " + self.level.wood.__str__())
                     if type(structure) is Structures.LumberJackTierTwo:
                         self.level.wood += structure.resources_per_loop
-                        print(self.level.wood)
+                        logger.info("Wood added: " + self.level.wood.__str__())
                     elif type(structure) is Structures.Quarry:
                         self.level.stone += structure.resources_per_loop
+                        logger.info("Stone added: " + self.level.stone.__str__())
                     elif type(structure) is Structures.IronMine:
                         self.level.iron += structure.resources_per_loop
+                        logger.info("Iron added: " + self.level.iron.__str__())
 
             if event.type == self.construction_event_id:
                 for construction in self.level.constructions:
-                    print(construction)
+                    # logger.info(construction)
                     construction.build_tick()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     xPos, yPos = pygame.mouse.get_pos()
-                    print("Click: ", xPos, yPos)
+                    logger.info("Clicked at: " + xPos.__str__() + " ," + yPos.__str__())
 
                     for row in self.level.mapAsTileRows:
                         for tile in row:
@@ -141,9 +168,44 @@ class Game:
                     this = self
                     self.windows.append(Screens.InGameMenu(this))
 
+                if event.key == pygame.K_w:
+                    self.renderer.move_map_up()
+
+                if event.key == pygame.K_s:
+                    self.renderer.move_map_down()
+
+                if event.key == pygame.K_a:
+                    self.renderer.move_map_left()
+
+                if event.key == pygame.K_d:
+                    self.renderer.move_map_right()
+
             for button in self.buttons:
                 if 'click' in button.handleEvent(event):
-                    self.show_territory = not self.show_territory
+
+                    if button._propGetCaption() is "T":
+                        self.renderer.toggle_territory_visibility()
+                    if button._propGetCaption() is "^":
+                        self.renderer.move_map_up()
+                    if button._propGetCaption() is "v":
+                        self.renderer.move_map_down()
+                    if button._propGetCaption() is "<":
+                        self.renderer.move_map_left()
+                    if button._propGetCaption() is ">":
+                        self.renderer.move_map_right()
+                    else:
+                        logger.info("button: " + button._caption)
+
+            if event.type == pygame.VIDEORESIZE:
+                old_width, old_height = self.width, self.height
+                self.width = event.w
+                self.height = event.h
+                dif_width, dif_height = self.width - old_width, self.height - old_height
+                pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+
+                for button in self.buttons:
+                    newrect = button._propGetRect().move(dif_width, dif_height)
+                    button._propSetRect(newrect)
 
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
@@ -158,36 +220,20 @@ class Game:
         self.play_music(self.music_volume)
 
     def render_on_loop(self, level: Level):
-        """:type level: Level"""
 
         self.screen.fill(ColorRGB.grey)
-        str_caption = "%.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
+        str_caption = "Gloria! \t \t %.f FPS %.f Playtime" % (self.clock.get_fps(), self.playtime)
         pygame.display.set_caption(str_caption)
 
         self.update_windows()
 
+        # TODO redo the buttons in the Randerer Class
         for button in self.buttons:
             button.draw(self.screen)
 
-        for row in level.mapAsTileRows:
-            for tile in row:
+        # self.renderer.levelToRender = level
+        self.renderer.render()
 
-                #TODO BUT WHY ????  komische reinfolge
-                render_destination = (
-                (tile.rel_pos_tuple[1] * 33) + self.y_offset, (tile.rel_pos_tuple[0] * 33) + self.x_offset)
-
-                tile.set_new_pos(render_destination)
-
-                self.screen.blit(tile.bg_img, render_destination)
-
-                if tile.is_in_territory and self.show_territory:
-                    self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
-
-                # Draw ggf. structures
-                if tile.structure is not None:
-                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
-
-        self.render_reassures_bar()
         pygame.display.flip()
 
     def update_windows(self):
@@ -197,49 +243,56 @@ class Game:
             else:
                 self.windows.remove(window)
 
-    def render_reassures_bar(self):
-        absand = 32 + 8
-        if self.level.wood >= 1:
-            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
-            str_anz_wood = ": %.f" % self.level.wood
-            text_surface = self.boxy_bold_25.render(str_anz_wood, False, (0, 0, 0))
-            self.screen.blit(text_surface, (52, 15))
-
-        if self.level.stone >= 1:
-            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
-            str_anz_stone = ": %.f" % self.level.stone
-            text_surface = self.boxy_bold_25.render(str_anz_stone, False, (0, 0, 0))
-            self.screen.blit(text_surface, (52, 42))
-
-        if self.level.iron >= 1:
-            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/iron.png")), (10, 74))
-            str_anz_iron = ": %.f" % self.level.iron
-            text_surface = self.boxy_bold_25.render(str_anz_iron, False, (0, 0, 0))
-            self.screen.blit(text_surface, (52, 74))
-
     def close(self):
         self.running = False
         for window in self.windows:
             try:
                 window.close()
             except BaseException:
-                print("Oops!  That was already closed")
+                logger.error("Oops!  That was already closed")
 
     def play_music(self, volume):
         pygame.mixer.music.set_volume(float(volume))
         if not pygame.mixer.music.get_busy():
             self.current_song_id = random.randint(0, self.songs.__len__() - 1)
-            print(self.songs[self.current_song_id])
+            logger.info("Song playing" + self.songs[self.current_song_id])
             pygame.mixer.music.load(self.songs[self.current_song_id])
             pygame.mixer.music.play()
 
     def init_bg_music(self):
+        # TODO Auto scan  the musik library
+        # TODO add more musik ?
         self.songs.append(os.path.join(parent_dir, "sounds/music/Glorious_Morning_Waterflame.mp3"))
-        # add more musik ?
+        self.songs.append(os.path.join(parent_dir, "sounds/music/Mid-Air_Machine_-_Untamed_Wings.mp3"))
 
     def load_settings(self):
         self.music_volume = cfg.get_value(cfg.sound_section, cfg.music_volume_option)
         self.effects_volume = cfg.get_value(cfg.sound_section, cfg.sfx_volume_option)
+
+    '''
+    def update_pygame_screen(self):
+        pygame.display.update()
+        self.screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h), pygame.RESIZABLE)
+
+        old_surface_saved = surface
+            surface = pygame.display.set_mode((event.w, event.h),
+                                              pygame.RESIZABLE)
+            # On the next line, if only part of the window
+            # needs to be copied, there's some other options.
+            surface.blit(old_surface_saved, (0, 0))
+            del old_surface_saved
+    '''
+
+    def init_buttons(self):
+        self.buttons.append(pygbutton.PygButton((self.width - 50, 0, 50, 50), 'T', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 150, self.height - 200, 50, 50), '<', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 250, 50, 50), '^', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 100, self.height - 150, 50, 50), 'v', font=self.boxy_bold_25))
+        self.buttons.append(
+            pygbutton.PygButton((self.width - 50, self.height - 200, 50, 50), '>', font=self.boxy_bold_25))
 
 
 class LevelParser:
@@ -264,9 +317,9 @@ class LevelParser:
 
         save_game_as_json_object = json.loads(save_game_as_string)
 
-        print("Miscellaneous: ", save_game_as_json_object[self.mapVar][self.miscVar])
-        print("Season: ", save_game_as_json_object[self.mapVar][self.seasonVar])
-        print("Resources: ", save_game_as_json_object[self.resourcesVar])
+        logger.info("Miscellaneous: " + save_game_as_json_object[self.mapVar][self.miscVar])
+        logger.info("Season: " + save_game_as_json_object[self.mapVar][self.seasonVar])
+        logger.info("Resources: " + save_game_as_json_object[self.resourcesVar].__str__())
 
         for rows in save_game_as_json_object[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
@@ -295,9 +348,6 @@ class LevelParser:
                 else:
                     temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
                                                   (row_index, tile_shortcut_index)))
-
-            for tile in temp_array:
-                print(tile)
 
             pos_x = Game.x_offset
             self.level.mapAsTileRows.append(temp_array)
@@ -401,7 +451,7 @@ class Construction:
             self.level.stone -= self.structure.build_costs[1]
             self.level.iron -= self.structure.build_costs[2]
         else:
-            print("Could not work, not enough items")
+            logger.info("Could not work, not enough resources")
 
         if self.time_till_completion == 0:
             self.build_done()
@@ -446,7 +496,7 @@ def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
         temp.set_structure(structure)
         return temp
     else:
-        print("There went something wrong for creating the Tile")
+        logger.error("There went something wrong for creating the Tile")
         return Tiles.NormalTile(pos, rel_pos)
 
 
@@ -464,3 +514,82 @@ def create_structure(shortcut: str):
         return Structures.Castle()
     else:
         return None
+
+
+class GameRender:
+    show_territory: bool = False
+    y_rendering_pos: int = 0
+    x_rendering_pos: int = 0
+
+    y_anchor_pos: int = 250
+    x_anchor_pos: int = 200
+
+    y_offset: int = 33
+    x_offset: int = 33
+
+    resource_boarder_gap: int = 150
+
+    comic_sans_30 = pygame.font.SysFont('Comic Sans MS', 30)
+    boxy_bold_25 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Boxy-Bold.ttf"), 25)
+    thor_20 = pygame.font.Font(os.path.join(parent_dir, "textures/utils/fonts/Thor.ttf"), 30)
+
+    def __init__(self, level: Level, screen):
+        logger.info("DAS IST EIN TEST info DAS SOLLTE FUNSEN")
+        self.levelToRender = level
+        self.screen = screen
+
+    def toggle_territory_visibility(self):
+        self.show_territory = not self.show_territory
+
+    def render(self):
+        self.render_map()
+        self.resource_bar()
+
+    def render_map(self):
+        for row in self.levelToRender.mapAsTileRows:
+            for tile in row:
+                self.y_rendering_pos = tile.rel_pos_tuple[0] * self.y_offset + self.y_anchor_pos
+                self.x_rendering_pos = tile.rel_pos_tuple[1] * self.x_offset + self.x_anchor_pos
+
+                logger.debug(("y_rendering_pos", self.y_rendering_pos, "x_rendering_pos", self.x_rendering_pos))
+
+                tile.set_new_pos((self.x_rendering_pos, self.y_rendering_pos))
+                self.screen.blit(tile.bg_img, (self.x_rendering_pos, self.y_rendering_pos))
+
+                if tile.is_in_territory is True and self.show_territory is True:
+                    self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
+
+                # Draw ggf. structures
+                if tile.structure is not None:
+                    self.screen.blit(tile.structure.structure_img, tile.associated_structure_pos)
+
+    def resource_bar(self):
+        if self.levelToRender.wood >= 1:
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/wood.png")), (10, 10))
+            str_anz_wood = ": %.f" % self.levelToRender.wood
+            text_surface = self.boxy_bold_25.render(str_anz_wood, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 15))
+
+        if self.levelToRender.stone >= 1:
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/stone2.png")), (10, 42))
+            str_anz_stone = ": %.f" % self.levelToRender.stone
+            text_surface = self.boxy_bold_25.render(str_anz_stone, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 42))
+
+        if self.levelToRender.iron >= 1:
+            self.screen.blit(pygame.image.load(os.path.join(parent_dir, "textures/resources/iron.png")), (10, 74))
+            str_anz_iron = ": %.f" % self.levelToRender.iron
+            text_surface = self.boxy_bold_25.render(str_anz_iron, False, (0, 0, 0))
+            self.screen.blit(text_surface, (52, 74))
+
+    def move_map_up(self):
+        self.y_anchor_pos -= 25
+
+    def move_map_down(self):
+        self.y_anchor_pos += 25
+
+    def move_map_left(self):
+        self.x_anchor_pos -= 25
+
+    def move_map_right(self):
+        self.x_anchor_pos += 25
