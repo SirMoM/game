@@ -1,9 +1,19 @@
-import tkinter
+"""
+This module is the starting point
 
-from src import Screens
+Import
+------
+    tkinter
+        used to create windows
+    Screens
+        used to create the main-menu
+"""
+
+from tkinter import Tk
+
+from src.Screens import MainMenu
 
 if __name__ == '__main__':
-    root = tkinter.Tk()
-    mm = Screens.MainMenu(root)
+    root: Tk = Tk()
+    mm: MainMenu = MainMenu(root)
     mm.start()
-

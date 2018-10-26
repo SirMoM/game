@@ -1,10 +1,36 @@
+"""
+This module holds all Tiles for the game.
+
+Import
+------
+    os
+        used to get the parent_dir
+    random
+        used to get a random element from a list
+    pygame
+        the game engine for the game
+    logging
+        basic python logging
+    Structures
+        for type hinting
+    Game
+        for type hinting
+    Tuple
+        for type hinting
+    Surface
+        for type hinting
+
+"""
+import logging
 import os
 import random
+from typing import Tuple
+
 import pygame
+from pygame import Surface
 
-import logging
-
-from src import Structures, Game
+from src.Game import Construction
+from src.Structures import Structure
 
 parent_dir = os.path.dirname(os.getcwd())
 
@@ -24,23 +50,23 @@ logger.addHandler(handler)
 
 
 class Tile:
-    name = None
-    bg_img = None
+    name: str = None
+    bg_img: Surface = None
     img_path: str
-    tile_pos = None
-    associated_structure_pos = None
-    has_structure = False
-    structure = False
+    tile_pos: Tuple[int, int] = None
+    associated_structure_pos: Tuple[int, int] = None
+    has_structure: bool = False
+    structure: bool = False
     shortcut: str = "D"
-    rect = None
-    rel_pos_tuple = ()
-    is_in_territory = False
-    construction: Game.Construction = None
-    x_offset : int = 16
-    y_offset : int = 16
-    green_boarder = os.path.join(parent_dir, "textures/utils/greenBoarder.png")
+    rel_pos_tuple: Tuple[int, int] = ()
+    is_in_territory: bool = False
+    construction: Construction = None
+    x_offset: int = 16
+    y_offset: int = 16
+    green_boarder: str = os.path.join(parent_dir, "textures/utils/greenBoarder.png")
 
-    def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
+    def __init__(self, name: str, bg_img: Surface, img_path: str, tile_pos: Tuple[int, int],
+                 rel_pos: Tuple[int, int]) -> None:
         self.name = name
         self.tile_pos = tile_pos
         self.bg_img = bg_img
@@ -50,24 +76,24 @@ class Tile:
 
         logger.debug("Just created a " + self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out_str = self.name
         return out_str
 
-    def set_structure(self, structure: Structures.Structure):
+    def set_structure(self, structure: Structure) -> None:
         self.has_structure = True
         self.structure = structure
 
-    def get_structure(self) -> Structures:
+    def get_structure(self) -> Structure:
         return self.structure
 
-    def set_new_pos(self, tile_pos):
+    def set_new_pos(self, tile_pos: Tuple[int, int]) -> None:
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + self.x_offset, tile_pos[1] + self.y_offset)
 
-    def is_point_in_tile(self, xPos, yPos):
-        if self.tile_pos[0] + 32 > xPos > self.tile_pos[0]:
-            if self.tile_pos[1] + 32 > yPos > self.tile_pos[1]:
+    def is_point_in_tile(self, x_pos: int, y_pos: int):
+        if self.tile_pos[0] + 32 > x_pos > self.tile_pos[0]:
+            if self.tile_pos[1] + 32 > y_pos > self.tile_pos[1]:
                 return True
             else:
                 return False
@@ -76,13 +102,13 @@ class Tile:
 
 
 class NormalTile(Tile):
-    shortcut = "N"
-    name = "Normal Ground"
-    img_path = os.path.join(parent_dir, "textures/tiles/normTile.png")
+    shortcut: str = "N"
+    name: str = "Normal Ground"
+    img_path: str = os.path.join(parent_dir, "textures/tiles/normTile.png")
     x_offset: int = 0
     y_offset: int = 0
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0], tile_pos[1])
@@ -92,11 +118,11 @@ class NormalTile(Tile):
 
 
 class ForestTile(Tile):
-    shortcut = "F"
-    name = "Forrest"
-    img_path = os.path.join(parent_dir, "textures/tiles/forestTile.png")
+    shortcut: str = "F"
+    name: str = "Forrest"
+    img_path: str = os.path.join(parent_dir, "textures/tiles/forestTile.png")
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.img_path = random.choice([os.path.join(parent_dir, "textures/tiles/forestTile.png"),
                                        os.path.join(parent_dir, "textures/tiles/forestTile2.png")])
         self.bg_img = pygame.image.load(self.img_path)
@@ -107,13 +133,13 @@ class ForestTile(Tile):
 
 
 class MineTile(Tile):
-    shortcut = "PM"  # Potential Mine
-    name = "Mine"
-    img_path = os.path.join(parent_dir, "textures/tiles/mineTile.png")
+    shortcut: str = "PM"  # Potential Mine
+    name: str = "Mine"
+    img_path: str = os.path.join(parent_dir, "textures/tiles/mineTile.png")
     x_offset: int = 8
     y_offset: int = 8
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 8)
@@ -123,11 +149,11 @@ class MineTile(Tile):
 
 
 class LakeTile(Tile):
-    shortcut = "L"
-    name = "Lake"
-    img_path = os.path.join(parent_dir, "textures/tiles/lakeTile.png")
+    shortcut: str = "L"
+    name: str = "Lake"
+    img_path: str = os.path.join(parent_dir, "textures/tiles/lakeTile.png")
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
@@ -137,13 +163,13 @@ class LakeTile(Tile):
 
 
 class MountainTile(Tile):
-    shortcut = "M"
-    name = "Mountain"
-    img_path = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
+    shortcut: str = "M"
+    name: str = "Mountain"
+    img_path: str = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
     x_offset: int = 8
     y_offset: int = 0
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1])
