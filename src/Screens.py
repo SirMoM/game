@@ -1,10 +1,10 @@
 import inspect
+import logging
 import os
 import sys
 import tkinter
-import logging
 
-from src import Tiles, Game, Structures
+from src import Tiles, GameMechanics, Structures
 from src import config as cfg
 from src.Utilities import ColorHex
 
@@ -28,7 +28,7 @@ logger.addHandler(handler)
 
 class TileScreen:
 
-    def __init__(self, game: Game.Game, tile: Tiles.Tile):
+    def __init__(self, game: GameMechanics.Game, tile: Tiles.Tile):
         logger.debug("Opend a Tile screen with a" + tile.__str__() + "Tile")
         self.game = game
         self.level = game.level
@@ -152,14 +152,14 @@ class TileScreen:
         if listbox.curselection().__len__() > 0:
             logger.debug("Building " + listbox.get(listbox.curselection()[0]))
 
-            self.tile.construction = Game.Construction(self.game, self.tile.rel_pos_tuple,
-                                                       listbox.get(listbox.curselection()[0]))
+            self.tile.construction = GameMechanics.Construction(self.game, self.tile.rel_pos_tuple,
+                                                                listbox.get(listbox.curselection()[0]))
             self.level.constructions.append(self.tile.construction)
             self.back_to_main_frame()
 
 
 class InGameMenu:
-    def __init__(self, game: Game.Game):
+    def __init__(self, game: GameMechanics.Game):
         self.game = game
         self.is_active = True
         self.game.pause = True
@@ -273,7 +273,7 @@ class SaveMenu(tkinter.Frame):
                 input_is_valid = False
 
         if input_is_valid:
-            Game.LevelWriter(user_input, self.game.level)
+            GameMechanics.LevelWriter(user_input, self.game.level)
             saved_label = GuiFactoryPack.label("Saved", master=self)
             saved_label.height = 2
             saved_label.place(x=180, y=40)
@@ -373,11 +373,11 @@ class MainMenu:
         map_path = map_to_load
         logger.info("The map_path to load is " + map_path)
 
-        level = Game.LevelParser(map_path).get_level()
+        level = GameMechanics.LevelParser(map_path).get_level()
 
         logger.debug("The loaded Level is " + level.__str__())
 
-        new_game = Game.Game(level)
+        new_game = GameMechanics.Game(level)
        #new_game.level = level
         new_game.execute()
 

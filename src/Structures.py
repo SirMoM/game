@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from src import Tiles, Game
+from src import Tiles
 
 parent_dir = os.path.dirname(os.getcwd())
 
@@ -115,12 +115,14 @@ class Castle(Structure):
     build_time = 10
     tile_range = 2
     tile = None
-    level: Game.Level
+    # TODO Type hints for The Level
+    level = None
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))
 
-    def create_territory(self, tile, level: Game.Level):
+    # TODO Level Hinting
+    def create_territory(self, tile, level):
         self.tile = tile
         self.level = level
         territory_start = []

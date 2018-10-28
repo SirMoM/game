@@ -29,7 +29,7 @@ from typing import Tuple
 import pygame
 from pygame import Surface
 
-from src.Game import Construction
+from src.GameMechanics import Construction
 from src.Structures import Structure
 
 parent_dir = os.path.dirname(os.getcwd())
