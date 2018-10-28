@@ -3,11 +3,14 @@ This module is just a little helper.
 
 Import
 ------
+    os
+        used to concat system-paths
     ClassVar
         used for type hinting
     Tuple
         used for type hinting
 """
+import os
 from typing import ClassVar, Tuple
 
 
@@ -33,9 +36,6 @@ class ColorHex:
                 the color grey as an hex-string
     """
 
-    def __init__(self):
-        print("This is a Utility Class DO NOT create a Object")
-
     black: ClassVar[str] = "#000000"
     white: ClassVar[str] = "#FFFFFF"
     red: ClassVar[str] = "#FF0000"
@@ -44,11 +44,13 @@ class ColorHex:
     purple: ClassVar[str] = "#800080"
     grey: ClassVar[str] = "#bbbbbb"
 
+    def __init__(self):
+        print("This is a Utility Class DO NOT create a Object")
+
 
 class ColorRGB:
     """
-        Some Colors in RGB as tuples
-
+    Some Colors in RGB as tuples
         Attributes
         ----------
             black: tuple
@@ -67,9 +69,6 @@ class ColorRGB:
                 the color grey as an RGB-tuple
     """
 
-    def __init__(self):
-        print("This is a Utility Class DO NOT create a Object")
-
     black: ClassVar[Tuple[int, int, int]] = (0, 0, 0)
     white: ClassVar[Tuple[int, int, int]] = (255, 255, 255)
     red: ClassVar[Tuple[int, int, int]] = (255, 0, 0)
@@ -77,3 +76,22 @@ class ColorRGB:
     blue: ClassVar[Tuple[int, int, int]] = (0, 0, 255)
     purple: ClassVar[Tuple[int, int, int]] = (150, 43, 186)
     grey: ClassVar[Tuple[int, int, int]] = (150, 150, 150)
+
+    def __init__(self):
+        print("This is a Utility Class DO NOT create a Object")
+
+
+def get_system_path_from_relative_path(rel_path: str) -> str:
+    """
+    Gives you the path to a file based on the storage location in the current system.
+
+    Parameters
+    ----------
+        :param rel_path: a string which describes the relative Path to a File
+
+    Return
+    ------
+        :return: a str which contains the full path to the File
+
+    """
+    return os.path.join(os.path.dirname(os.getcwd()), rel_path)
