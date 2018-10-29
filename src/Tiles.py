@@ -22,7 +22,7 @@ Import
 
 """
 import random
-from typing import Tuple
+from typing import Tuple, ClassVar
 
 import pygame
 from pygame import Surface
@@ -39,7 +39,7 @@ class Tile:
     tile_pos: Tuple[int, int] = None
     associated_structure_pos: Tuple[int, int] = None
     has_structure: bool = False
-    structure: bool = False
+    _structure: bool = False
     shortcut: str = "D"
     rel_pos_tuple: Tuple[int, int] = ()
     is_in_territory: bool = False
@@ -57,24 +57,48 @@ class Tile:
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
     def __str__(self) -> str:
         out_str = self.name
         return out_str
 
     def set_structure(self, structure: Structure) -> None:
+        """
+        Sets a _structure of a tile and turns the 'has_structure' flag true.
+
+        :param structure: the _structure to set
+        """
         self.has_structure = True
-        self.structure = structure
+        self._structure = structure
 
     def get_structure(self) -> Structure:
-        return self.structure
+        """
+        Gets you the structure of the tile
+
+        :return: the structure of the tile
+        """
+        return self._structure
 
     def set_new_pos(self, tile_pos: Tuple[int, int]) -> None:
+        """
+        Sets the absolute position of the Tile and updates the absolute position of where the structure
+        should be rendered on the Tile
+
+        :param tile_pos: the new absolute position to set
+        """
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + self.x_offset, tile_pos[1] + self.y_offset)
 
-    def is_point_in_tile(self, x_pos: int, y_pos: int):
+    def is_point_in_tile(self, x_pos: int, y_pos: int) -> bool:
+        """
+        Tells you if a pair if coordinates is inside the tile.
+
+
+        :param x_pos: the absolute x-Position
+        :param y_pos: the absolute y-Position
+        :return: if the coordinates are in the Tile
+        """
         if self.tile_pos[0] + 32 > x_pos > self.tile_pos[0]:
             if self.tile_pos[1] + 32 > y_pos > self.tile_pos[1]:
                 return True
@@ -85,9 +109,12 @@ class Tile:
 
 
 class NormalTile(Tile):
-    shortcut: str = "N"
-    name: str = "Normal Ground"
-    img_path: str = get_system_path_from_relative_path("textures/tiles/normTile.png")
+    """
+    The normal ground Tile.
+    """
+    shortcut: ClassVar[str] = "N"
+    name: ClassVar[str] = "Normal Ground"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/normTile.png")
     x_offset: int = 0
     y_offset: int = 0
 
@@ -101,9 +128,12 @@ class NormalTile(Tile):
 
 
 class ForestTile(Tile):
-    shortcut: str = "F"
-    name: str = "Forrest"
-    img_path: str = get_system_path_from_relative_path("textures/tiles/forestTile.png")
+    """
+    A forest Tile.
+    """
+    shortcut: ClassVar[str] = "F"
+    name: ClassVar[str] = "Forrest"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/forestTile.png")
 
     def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.img_path = random.choice([get_system_path_from_relative_path("textures/tiles/forestTile.png"),
@@ -112,15 +142,18 @@ class ForestTile(Tile):
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
-        #TODO LOG logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
 
 class MineTile(Tile):
-    shortcut: str = "PM"  # Potential Mine
-    name: str = "Mine"
+    """
+    A Tile where a mine can be build.
+    """
+    shortcut: ClassVar[str] = "PM"  # Potential Mine
+    name: ClassVar[str] = "Mine"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/mineTile.png")
     x_offset: int = 8
     y_offset: int = 8
-    img_path: str = get_system_path_from_relative_path("textures/tiles/mineTile.png")
 
     def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         print(self.img_path)
@@ -133,9 +166,12 @@ class MineTile(Tile):
 
 
 class LakeTile(Tile):
-    shortcut: str = "L"
-    name: str = "Lake"
-    img_path: str = get_system_path_from_relative_path("textures/tiles/lakeTile.png")
+    """
+    The lake Tile.
+    """
+    shortcut: ClassVar[str] = "L"
+    name: ClassVar[str] = "Lake"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/lakeTile.png")
 
     def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
@@ -147,9 +183,12 @@ class LakeTile(Tile):
 
 
 class MountainTile(Tile):
-    shortcut: str = "M"
-    name: str = "Mountain"
-    img_path: str = get_system_path_from_relative_path("textures/tiles/mountainTile.png")
+    """
+    The mountain Tile
+    """
+    shortcut: ClassVar[str] = "M"
+    name: ClassVar[str] = "Mountain"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/mountainTile.png")
     x_offset: int = 8
     y_offset: int = 0
 
@@ -159,4 +198,4 @@ class MountainTile(Tile):
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1])
         self.rel_pos_tuple = rel_pos
 
-        #TODO LOG logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)

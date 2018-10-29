@@ -71,14 +71,14 @@ class TileScreen:
         resource_base_str = "Resources: {0:.1f} {1} per second"
         is_in_territory_base_str = "This area is {0} in your Territory"
 
-        if self.tile.structure:
+        if self.tile.get_structure():
             structure_label = tkinter.Label(self.overview_frame)
-            structure_label["text"] = structure_base_str.format(self.tile.structure.name)
+            structure_label["text"] = structure_base_str.format(self.tile.get_structure().name)
             structure_label.pack(side=tkinter.TOP, pady=distance)
 
             resource_label = tkinter.Label(self.overview_frame)
-            resource_label["text"] = resource_base_str.format(self.tile.structure.resources_per_loop,
-                                                              self.tile.structure.resources_type)
+            resource_label["text"] = resource_base_str.format(self.tile.get_structure().resources_per_loop,
+                                                              self.tile.get_structure().resources_type)
             resource_label.pack(side=tkinter.TOP, pady=distance)
 
         else:
