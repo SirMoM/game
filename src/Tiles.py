@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 """
 This module holds all Tiles for the game.
 
@@ -70,7 +72,7 @@ class Tile:
         :param structure: the _structure to set
         """
         self.has_structure = True
-        self._structure = structure
+        self._structure: Structure = structure
 
     def get_structure(self) -> Structure:
         """

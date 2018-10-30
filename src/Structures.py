@@ -156,3 +156,13 @@ class Castle(Structure):
             return True
         else:
             return False
+
+
+class StructureException(BaseException):
+    """
+    An exception for everything that can go wrong with Structures.
+    """
+
+    def __init__(self, message):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
