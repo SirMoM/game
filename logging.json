@@ -49,7 +49,7 @@
     "loggers": {
         "my_module": {
             "level": "ERROR",
-            "handlers": ["console"],
+            "handlers": ["console","info_file_handler"],
             "propagate": false
         }
     },
