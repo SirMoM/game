@@ -15,22 +15,31 @@ from src.Utilities import ColorRGB
 __author__ = "Noah Ruben"
 __version__ = "0.1"
 
+# i'm assuming that the basic level is info
 parent_dir = os.path.dirname(os.getcwd())
-
+print(parent_dir)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+# logger.setLevel(logging.INFO)
 
-# create a file handler
-handler = logging.FileHandler(os.path.join(parent_dir, "logs/GameLog.log"))
-handler.setLevel(logging.INFO)
+# create a file handlers
+handler_INFO = logging.FileHandler(os.path.join(parent_dir, "logs/GameLog.log"))
+handler_DEBUG = logging.FileHandler(os.path.join(parent_dir, "logs/GameDebug.log"))
+handler_ERR = logging.FileHandler(os.path.join(parent_dir, "logs/GameError.log"))
+handler_INFO.setLevel(logging.INFO)
+handler_DEBUG.setLevel(logging.DEBUG)
+handler_ERR.setLevel(logging.ERROR)
 
 # create a logging format
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
+handler_INFO.setFormatter(formatter)
+handler_DEBUG.setFormatter(formatter)
+handler_ERR.setFormatter(formatter)
 
 # add the handlers to the logger
-logger.addHandler(handler)
-
+logger.addHandler(handler_DEBUG)
+logger.addHandler(handler_INFO)
+logger.addHandler(handler_ERR)
 
 class Level:
     mapAsTileRows = []
@@ -167,6 +176,7 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     this = self
                     self.windows.append(Screens.InGameMenu(this))
+                    logger.info("EXC pressed")
 
                 if event.key == pygame.K_w:
                     self.renderer.move_map_up()
@@ -210,6 +220,7 @@ class Game:
             # quit if the quit button was pressed
             if event.type == pygame.QUIT:
                 self.running = False
+                logger.info("QUIT")
                 pygame.quit()
                 sys.exit()
 
@@ -249,7 +260,7 @@ class Game:
             try:
                 window.close()
             except BaseException:
-                logger.error("Oops!  That was already closed")
+                logger.error("Oops!  That was already closed", exc_info=True)
 
     def play_music(self, volume):
         pygame.mixer.music.set_volume(float(volume))
@@ -471,7 +482,10 @@ class Construction:
             self.structure.create_territory(self.tile, self.level)
 
     def __str__(self):
+        logger.info(
+            str(self.time_till_completion) + " successful workdays till completiosn of the " + self.structure.name)
         return str(self.time_till_completion) + " successful workdays till completion of the " + self.structure.name
+
 
 
 def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
@@ -496,7 +510,7 @@ def create_tile(shortcut: str, pos: tuple, rel_pos, structure=None):
         temp.set_structure(structure)
         return temp
     else:
-        logger.error("There went something wrong for creating the Tile")
+        logger.error("There went something wrong for creating the Tile", exec_info=True)
         return Tiles.NormalTile(pos, rel_pos)
 
 
@@ -535,6 +549,7 @@ class GameRender:
 
     def __init__(self, level: Level, screen):
         logger.info("DAS IST EIN TEST info DAS SOLLTE FUNSEN")
+        logger.debug("TUTS AUCH")
         self.levelToRender = level
         self.screen = screen
 

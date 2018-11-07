@@ -8,3 +8,76 @@
 2018-11-07 18:43:08,516 - src.Game - INFO - NEW GAME
 2018-11-07 18:43:08,979 - src.Game - INFO - DAS IST EIN TEST info DAS SOLLTE FUNSEN
 2018-11-07 18:43:08,985 - src.Game - INFO - Song playingC:\Users\Fatflat\PycharmProjects\game\sounds/music/Glorious_Morning_Waterflame.mp3
+2018-11-07 20:28:47,455 - src.Screens - INFO - Started Main Menue
+2018-11-07 20:29:11,491 - src.Screens - INFO - Load Game
+2018-11-07 20:29:17,658 - src.Screens - INFO - New Game
+2018-11-07 20:29:18,698 - src.Screens - INFO - Start Game
+2018-11-07 20:29:18,698 - src.Screens - INFO - The map_path to load is maps/level_1.map
+2018-11-07 20:29:18,710 - src.Game - INFO - Miscellaneous: None
+2018-11-07 20:29:18,710 - src.Game - INFO - Season: Winter
+2018-11-07 20:29:18,711 - src.Game - INFO - Resources: {'wood': 50, 'stone': 30, 'iron': 30}
+2018-11-07 20:29:18,721 - src.Game - INFO - NEW GAME
+2018-11-07 20:29:19,222 - src.Game - INFO - DAS IST EIN TEST info DAS SOLLTE FUNSEN
+2018-11-07 20:29:19,228 - src.Game - INFO - Song playingC:\Users\Fatflat\PycharmProjects\game\sounds/music/Glorious_Morning_Waterflame.mp3
+2018-11-07 20:29:49,927 - src.Game - INFO - Clicked at: 241 ,362
+2018-11-07 20:29:57,888 - src.Game - INFO - Clicked at: 319 ,382
+2018-11-07 20:29:58,346 - src.Game - INFO - Clicked at: 316 ,372
+2018-11-07 20:30:00,650 - src.Game - INFO - Clicked at: 365 ,32
+2018-11-07 20:30:01,429 - src.Game - INFO - Clicked at: 274 ,316
+2018-11-07 20:30:02,297 - src.Game - INFO - Clicked at: 223 ,269
+2018-11-07 20:30:04,334 - src.Game - INFO - Clicked at: 177 ,493
+2018-11-07 20:30:05,130 - src.Game - INFO - Clicked at: 241 ,397
+2018-11-07 20:30:06,128 - src.Game - INFO - Clicked at: 251 ,482
+2018-11-07 20:30:07,691 - src.Game - INFO - Clicked at: 328 ,0
+2018-11-07 20:30:08,591 - src.Game - INFO - Clicked at: 645 ,0
+2018-11-07 20:30:15,863 - src.Game - INFO - Clicked at: 624 ,0
+2018-11-07 20:30:16,901 - src.Game - INFO - Clicked at: 772 ,0
+2018-11-07 20:30:18,225 - src.Game - INFO - Clicked at: 0 ,298
+2018-11-07 20:30:18,886 - src.Game - INFO - Clicked at: 234 ,292
+2018-11-07 20:30:21,685 - src.Game - INFO - Clicked at: 427 ,114
+2018-11-07 20:30:22,210 - src.Game - INFO - Clicked at: 446 ,246
+2018-11-07 20:30:22,668 - src.Game - INFO - Clicked at: 379 ,490
+2018-11-07 20:30:23,178 - src.Game - INFO - Clicked at: 140 ,313
+2018-11-07 20:30:23,517 - src.Game - INFO - Clicked at: 177 ,307
+2018-11-07 20:30:24,760 - src.Game - INFO - Clicked at: 977 ,0
+2018-11-07 20:30:24,861 - src.Game - INFO - button: T
+2018-11-07 20:30:25,660 - src.Game - INFO - Clicked at: 981 ,27
+2018-11-07 20:30:25,778 - src.Game - INFO - button: T
+2018-11-07 20:30:26,154 - src.Game - INFO - Clicked at: 972 ,36
+2018-11-07 20:30:26,290 - src.Game - INFO - button: T
+2018-11-07 20:30:27,548 - src.Game - INFO - Clicked at: 809 ,320
+2018-11-07 20:30:28,739 - src.Game - INFO - Clicked at: 319 ,201
+2018-11-07 20:30:29,403 - src.Game - INFO - Clicked at: 208 ,180
+2018-11-07 20:30:30,166 - src.Game - INFO - Clicked at: 330 ,350
+2018-11-07 20:30:31,357 - src.Game - INFO - Clicked at: 461 ,131
+2018-11-07 20:30:32,644 - src.Game - INFO - Clicked at: 0 ,119
+2018-11-07 20:30:33,221 - src.Game - INFO - Clicked at: 0 ,65
+2018-11-07 20:30:48,158 - src.Game - INFO - Clicked at: 1559 ,856
+2018-11-07 20:30:48,464 - src.Game - INFO - button: <
+2018-11-07 20:30:48,941 - src.Game - INFO - Clicked at: 1628 ,795
+2018-11-07 20:30:49,043 - src.Game - INFO - button: ^
+2018-11-07 20:30:49,603 - src.Game - INFO - Clicked at: 1604 ,903
+2018-11-07 20:30:49,721 - src.Game - INFO - button: v
+2018-11-07 20:30:49,858 - src.Game - INFO - Clicked at: 1602 ,904
+2018-11-07 20:30:49,942 - src.Game - INFO - button: v
+2018-11-07 20:30:50,045 - src.Game - INFO - Clicked at: 1602 ,904
+2018-11-07 20:30:50,146 - src.Game - INFO - button: v
+2018-11-07 20:30:50,928 - src.Game - INFO - Clicked at: 1528 ,863
+2018-11-07 20:30:51,148 - src.Game - INFO - Clicked at: 1528 ,863
+2018-11-07 20:30:51,336 - src.Game - INFO - Clicked at: 1560 ,858
+2018-11-07 20:30:51,404 - src.Game - INFO - button: <
+2018-11-07 20:30:51,507 - src.Game - INFO - Clicked at: 1560 ,858
+2018-11-07 20:30:51,607 - src.Game - INFO - button: <
+2018-11-07 20:30:51,710 - src.Game - INFO - Clicked at: 1560 ,858
+2018-11-07 20:30:51,777 - src.Game - INFO - button: <
+2018-11-07 20:30:52,607 - src.Game - INFO - Clicked at: 1666 ,840
+2018-11-07 20:30:52,777 - src.Game - INFO - Clicked at: 1664 ,840
+2018-11-07 20:30:52,963 - src.Game - INFO - Clicked at: 1664 ,840
+2018-11-07 20:30:53,778 - src.Game - INFO - Clicked at: 217 ,343
+2018-11-07 20:30:58,618 - src.Game - INFO - Clicked at: 295 ,319
+2018-11-07 20:31:02,516 - src.Game - INFO - Clicked at: 1629 ,43
+2018-11-07 20:31:02,873 - src.Game - INFO - Clicked at: 1644 ,53
+2018-11-07 20:31:02,996 - src.Game - INFO - button: T
+2018-11-07 20:31:05,259 - src.Game - INFO - Clicked at: 34 ,31
+2018-11-07 20:31:05,732 - src.Game - INFO - Clicked at: 30 ,69
+2018-11-07 20:31:08,722 - src.Game - INFO - QUIT
