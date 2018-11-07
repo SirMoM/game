@@ -1,0 +1,10 @@
+2018-11-07 18:43:03,632 - src.Screens - INFO - Started Main Menue
+2018-11-07 18:43:07,313 - src.Screens - INFO - New Game
+2018-11-07 18:43:08,370 - src.Screens - INFO - Start Game
+2018-11-07 18:43:08,371 - src.Screens - INFO - The map_path to load is maps/level_2.map
+2018-11-07 18:43:08,402 - src.Game - INFO - Miscellaneous: None
+2018-11-07 18:43:08,402 - src.Game - INFO - Season: Summer
+2018-11-07 18:43:08,402 - src.Game - INFO - Resources: {'wood': 100, 'stone': 100, 'iron': 100}
+2018-11-07 18:43:08,516 - src.Game - INFO - NEW GAME
+2018-11-07 18:43:08,979 - src.Game - INFO - DAS IST EIN TEST info DAS SOLLTE FUNSEN
+2018-11-07 18:43:08,985 - src.Game - INFO - Song playingC:\Users\Fatflat\PycharmProjects\game\sounds/music/Glorious_Morning_Waterflame.mp3
