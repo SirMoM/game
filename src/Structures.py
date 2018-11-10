@@ -7,7 +7,7 @@ from src import Tiles
 parent_dir = os.path.dirname(os.getcwd())
 
 
-class Structure:
+class Structure(object):
     resources_per_loop: float
     name: str
     structure_img: str
@@ -41,7 +41,7 @@ class LumberJack(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
+        if tile.get_structure() is None and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -61,7 +61,8 @@ class LumberJackTierTwo(Structure):
 
     @staticmethod
     def can_build(tile):
-        if type(tile.structure) is LumberJack and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
+        if type(
+                tile.get_structure()) is LumberJack and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -80,7 +81,7 @@ class Quarry(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.MountainTile.shortcut and tile.is_in_territory:
+        if tile.get_structure() is None and tile.shortcut is Tiles.MountainTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -100,7 +101,7 @@ class IronMine(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.MineTile.shortcut and tile.is_in_territory:
+        if tile.get_structure() is None and tile.shortcut is Tiles.MineTile.shortcut and tile.is_in_territory:
             return True
         else:
             return False
@@ -112,7 +113,7 @@ class Castle(Structure):
     shortcut = "C"
     name = "Castle"
     build_costs = 5, 5, 5
-    build_time = 10
+    build_time = 1
     tile_range = 2
     tile = None
     # TODO Type hints for The Level
@@ -143,6 +144,7 @@ class Castle(Structure):
         if territory_start[1] < 0:
             territory_start[1] = 0
 
+        # TODO LOG this its kinda important
         print("territory_start ", territory_start)
         print("territory_end ", territory_end)
 
@@ -152,7 +154,7 @@ class Castle(Structure):
 
     @staticmethod
     def can_build(tile):
-        if tile.structure is None and tile.shortcut is Tiles.NormalTile.shortcut:
+        if tile.get_structure() is None and tile.shortcut is Tiles.NormalTile.shortcut:
             return True
         else:
             return False

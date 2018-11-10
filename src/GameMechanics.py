@@ -137,7 +137,7 @@ class Game:
             else:
                 self.on_event()
                 self.on_loop()
-                self.render_on_loop(self.level)
+                self.render_on_loop()
 
         pygame.mixer.music.stop()
         pygame.display.quit()
@@ -368,23 +368,29 @@ class LevelParser:
             temp_array.clear()
             for tile_shortcut_index in range(0, self.mapAsRowArray[row_index].__len__()):
                 pos_x += 33
-                if self.structuresAsRowArray:
-                    temp_structure = create_structure(self.structuresAsRowArray[row_index][tile_shortcut_index])
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
-                                                  (row_index, tile_shortcut_index),
-                                                  structure=temp_structure))
+                try:
+                    temp_structure: Structure = create_structure(
+                        self.structuresAsRowArray[row_index][tile_shortcut_index])
+                except StructureException:
+                    # TODO log the exception
+                    temp_structure = None
+
+                temp_tile: Tiles.Tile = create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
+                                                    (row_index, tile_shortcut_index), structure=temp_structure)
+
+                # create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index))
+                temp_array.append(temp_tile)
+                if temp_structure is not None:
                     self.level.structures.append(temp_structure)
-                else:
-                    temp_array.append(create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
-                                                  (row_index, tile_shortcut_index)))
+
 
             pos_x = Game.x_offset
             self.level.mapAsTileRows.append(temp_array)
 
         for row in self.level.mapAsTileRows:
             for tile in row:
-                if tile.get_structure is not None and type(tile.get_structure) == Structures.Castle:
-                    tile.get_structure.create_territory(tile=tile, level=self.level)
+                if tile.get_structure() is not None and type(tile.get_structure) == Structures.Castle:
+                    tile.get_structure().create_territory(tile=tile, level=self.level)
 
         # set the level resources
         self.level.wood = save_game_as_json_object[self.resourcesVar][self.woodVar]
@@ -439,8 +445,8 @@ class LevelWriter(object):
             temp_structures_shortcut_array.clear()
             for tile in row:
                 temp_tile_shortcut_array.append(tile.shortcut)
-                if tile.structure:
-                    temp_structures_shortcut_array.append(tile.structure.shortcut)
+                if tile.get_structure():
+                    temp_structures_shortcut_array.append(tile.get_structure().shortcut)
                 else:
                     temp_structures_shortcut_array.append("N")
 
@@ -515,10 +521,10 @@ class Construction:
         """
         Completes a construction.
         """
-        if self.tile.structure is not None:
+        if self.tile.get_structure() is not None:
             self.level.structures.remove(self.tile.structure)
 
-        self.tile.structure = self.structure
+        self.tile.set_structure(self.structure)
         self.tile.construction = None
         self.level.structures.append(self.structure)
         self.level.constructions.remove(self)
