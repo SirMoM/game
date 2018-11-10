@@ -628,14 +628,14 @@ class GameRender:
         This class is for rendering the game.
     """
     show_territory: bool = False
-    y_rendering_pos: int = 0
-    x_rendering_pos: int = 0
+    _y_rendering_pos: int = 0
+    _x_rendering_pos: int = 0
 
-    y_anchor_pos: int = 250
-    x_anchor_pos: int = 200
+    _y_anchor_pos: int = 250
+    _x_anchor_pos: int = 200
 
-    y_offset: int = 33
-    x_offset: int = 33
+    _y_offset: int = 33
+    _x_offset: int = 33
 
     resource_boarder_gap: int = 150
 
@@ -668,13 +668,13 @@ class GameRender:
         """
         for row in self.levelToRender.mapAsTileRows:
             for tile in row:
-                self.y_rendering_pos = tile.rel_pos_tuple[0] * self.y_offset + self.y_anchor_pos
-                self.x_rendering_pos = tile.rel_pos_tuple[1] * self.x_offset + self.x_anchor_pos
+                self._y_rendering_pos = tile.rel_pos_tuple[0] * self._y_offset + self._y_anchor_pos
+                self._x_rendering_pos = tile.rel_pos_tuple[1] * self._x_offset + self._x_anchor_pos
 
-                # TODO logger.debug(("y_rendering_pos", self.y_rendering_pos, "x_rendering_pos", self.x_rendering_pos))
+                # TODO logger.debug(("_y_rendering_pos", self._y_rendering_pos, "_x_rendering_pos", self._x_rendering_pos))
 
-                tile.set_new_pos((self.x_rendering_pos, self.y_rendering_pos))
-                self.screen.blit(tile.bg_img, (self.x_rendering_pos, self.y_rendering_pos))
+                tile.set_new_pos((self._x_rendering_pos, self._y_rendering_pos))
+                self.screen.blit(tile.bg_img, (self._x_rendering_pos, self._y_rendering_pos))
 
                 if tile.is_in_territory is True and self.show_territory is True:
                     self.screen.blit(pygame.image.load(tile.green_boarder), tile.tile_pos)
@@ -712,22 +712,22 @@ class GameRender:
         """
         moves the map 25 pixels up
         """
-        self.y_anchor_pos -= 25
+        self._y_anchor_pos -= 25
 
     def move_map_down(self) -> None:
         """
         moves the map 25 pixels down
         """
-        self.y_anchor_pos += 25
+        self._y_anchor_pos += 25
 
     def move_map_left(self) -> None:
         """
         moves the map 25 pixels left
         """
-        self.x_anchor_pos -= 25
+        self._x_anchor_pos -= 25
 
     def move_map_right(self) -> None:
         """
         moves the map 25 pixels right
         """
-        self.x_anchor_pos += 25
+        self._x_anchor_pos += 25

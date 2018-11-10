@@ -25,7 +25,7 @@ class Structure(object):
         return out_str
 
     @staticmethod
-    def can_build(tile):
+    def can_build(tile) -> bool:
         """
             This method checks if this structure can be build ontop this Tile
 
@@ -51,23 +51,23 @@ class LumberJack(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures\structures\lumberJack.png"))
 
+    @staticmethod
+    def can_build(tile) -> bool:
+        """
+            This method checks if this structure can be build ontop this Tile
 
-def can_build(tile):
-    """
-        This method checks if this structure can be build ontop this Tile
+            Parameter
+            ---------
+            :param tile: the tile which has to be compatible
 
-        Parameter
-        ---------
-        :param tile: the tile which has to be compatible
-
-        Returns
-        -------
-        :return bool: true if this can be build.
-    """
-    if tile.get_structure() is None and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
-        return True
-    else:
-        return False
+            Returns
+            -------
+            :return bool: true if this can be build.
+        """
+        if tile.get_structure() is None and tile.shortcut is Tiles.ForestTile.shortcut and tile.is_in_territory:
+            return True
+        else:
+            return False
 
 
 class LumberJackTierTwo(Structure):
@@ -83,7 +83,7 @@ class LumberJackTierTwo(Structure):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/lumberJackTII.png"))
 
     @staticmethod
-    def can_build(tile):
+    def can_build(tile) -> bool:
         """
             This method checks if this structure can be build ontop this Tile
 
@@ -114,7 +114,7 @@ class Quarry(Structure):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/quarry.png"))
 
     @staticmethod
-    def can_build(tile):
+    def can_build(tile) -> bool:
         """
             This method checks if this structure can be build ontop this Tile
 
@@ -145,7 +145,7 @@ class IronMine(Structure):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/ironMine.png"))
 
     @staticmethod
-    def can_build(tile):
+    def can_build(tile) -> bool:
         """
             This method checks if this structure can be build ontop this Tile
 
@@ -177,7 +177,7 @@ class Castle(Structure):
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/castle.png"))
 
-    # TODO Level Hinting
+    # TODO Level Hinting for params
     def create_territory(self, tile, level) -> None:
         self.tile = tile
         self.level = level
@@ -208,7 +208,7 @@ class Castle(Structure):
                 self.level.mapAsTileRows[i][j].is_in_territory = True
 
     @staticmethod
-    def can_build(tile):
+    def can_build(tile) -> bool:
         """
             This method checks if this structure can be build ontop this Tile
 

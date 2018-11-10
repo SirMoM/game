@@ -44,10 +44,18 @@ class Textfield:
 
 
 def get_all_structures():
+    """
+    Returns
+    -------
+        List
+            a list of all structures in the structures module
+    """
     structures = []
     for name, obj in inspect.getmembers(sys.modules[Structures.__name__]):
-        if inspect.isclass(obj) and name is not "StructureException":
-            structures.append(obj)
+        if inspect.isclass(obj):
+            if issubclass(obj, Structures.Structure):
+                structures.append(obj)
+
     return structures
 
 
@@ -190,7 +198,8 @@ class TileScreen:
 
         construction_options = []
         for structure in all_structures:
-            if can_build(self.tile):
+            print(structure)
+            if structure.can_build(self.tile):
                 construction_options.append(structure)
 
         return construction_options
