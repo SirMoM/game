@@ -42,6 +42,8 @@ class Level:
     stone: int = 0
     iron: int = 0
 
+    level_name = "Level name"
+
     def resources_as_string(self) -> str:
         """
         A formatted way for the resources of the level
@@ -50,18 +52,19 @@ class Level:
         -------
         :return all resources as a String
         """
-        resources_str = "%.f Wood %.f Iron" % (self.wood, self.iron)
+        resources_str = "{} Wood {} Stone {} Iron ".format(self.wood, self.stone, self.iron)
         return resources_str
 
     def __str__(self):
+        size_str: str = "Size: {} x {}".format(self.mapAsTileRows.__len__(), self.mapAsTileRows[0].__len__())
         # TODO Do it right so someone can understand this output
-
-        str_names = ""
-        for row in self.mapAsTileRows:
-            for tile in row:
-                str_names += tile.__str__() + ", "
-            str_names += "\n"
-        return str_names
+        str_out: str = "###################### \n"
+        str_out = str_out + "#{:^20}# \n".format(self.level_name)
+        str_out = str_out + "#{:^20}# \n".format(size_str)
+        str_out = str_out + "#{:^20}# \n".format("Constructions: " + self.constructions.__len__().__str__())
+        str_out = str_out + "#{:^20}# \n".format("Structures: " + self.structures.__len__().__str__())
+        str_out = str_out + "###################### \n"
+        return str_out
 
 
 class Game:
@@ -412,6 +415,7 @@ class LevelParser:
         gives you the level
         :return: The level resulting from the Level-Parser
         """
+        print(self.level)
         return self.level
 
 
@@ -616,7 +620,7 @@ def create_structure(shortcut: str) -> Structure:
     elif shortcut == Structures.Castle.shortcut or shortcut == Structures.Castle.name:
         return Structures.Castle()
     else:
-        raise StructureException("Could not create a Structure")
+        raise StructureException("Could not create a Structure", shortcut=shortcut)
 
 
 class GameRender:

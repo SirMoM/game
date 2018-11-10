@@ -187,9 +187,10 @@ class TileScreen:
             checks what Structures can be build on this Tile
         """
         all_structures = get_all_structures()
+
         construction_options = []
         for structure in all_structures:
-            if structure.can_build(self.tile):
+            if can_build(self.tile):
                 construction_options.append(structure)
 
         return construction_options
