@@ -362,27 +362,35 @@ class LevelParser:
         pos_y = Game.y_offset
         pos_x = Game.y_offset
 
+        print("structuresAsRowArray" + self.structuresAsRowArray.__str__())
+        print("mapAsRowArray" + self.mapAsRowArray.__str__())
+
         for row_index in range(0, self.mapAsRowArray.__len__()):
             pos_y += 33
             temp_array = []
             temp_array.clear()
             for tile_shortcut_index in range(0, self.mapAsRowArray[row_index].__len__()):
                 pos_x += 33
-                try:
-                    temp_structure: Structure = create_structure(
-                        self.structuresAsRowArray[row_index][tile_shortcut_index])
-                except StructureException:
-                    # TODO log the exception
-                    temp_structure = None
+                if self.structuresAsRowArray:
+                    try:
+                        temp_structure: Structure = create_structure(
+                            self.structuresAsRowArray[row_index][tile_shortcut_index])
+                        self.level.structures.append(temp_structure)
+                    except StructureException:
+                        # TODO log the exception
+                        temp_structure = None
 
-                temp_tile: Tiles.Tile = create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y),
-                                                    (row_index, tile_shortcut_index), structure=temp_structure)
+                    temp_tile: Tiles.Tile = create_tile(self.mapAsRowArray[row_index][tile_shortcut_index],
+                                                        (pos_x, pos_y), (row_index, tile_shortcut_index),
+                                                        structure=temp_structure)
+                else:
+                    temp_tile: Tiles.Tile = create_tile(self.mapAsRowArray[row_index][tile_shortcut_index],
+                                                        (pos_x, pos_y), (row_index, tile_shortcut_index))
 
-                # create_tile(self.mapAsRowArray[row_index][tile_shortcut_index], (pos_x, pos_y), (row_index, tile_shortcut_index))
                 temp_array.append(temp_tile)
-                if temp_structure is not None:
-                    self.level.structures.append(temp_structure)
 
+                # if temp_structure is not None:
+                # self.level.structures.append(temp_structure)
 
             pos_x = Game.x_offset
             self.level.mapAsTileRows.append(temp_array)
