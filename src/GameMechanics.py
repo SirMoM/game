@@ -236,7 +236,6 @@ class Game:
     def on_loop(self) -> None:
         """
         All the game logic per loop
-        :return:
         """
         # Time
         self.millis = self.clock.tick(self.FPS)
@@ -328,6 +327,9 @@ class Game:
 
 
 class LevelParser:
+    """
+        This generates a level object for a level save file.
+    """
     mapVar: str = "map"
     terrainVar: str = "terrain"
     rowVar: str = "row"
@@ -412,8 +414,10 @@ class LevelParser:
 
     def get_level(self) -> Level:
         """
-        gives you the level
-        :return: The level resulting from the Level-Parser
+        Returns
+        -------
+            Level
+                the parsed level object
         """
         print(self.level)
         return self.level
@@ -472,11 +476,12 @@ class LevelWriter(object):
         json.dump(json_obj, self.save_game_file)
         self.save_game_file.close()
 
-    def create_row(self, row_content) -> json:
+    def create_row(self, row_content: str) -> json:
         """
         Creates a json object from row-values
 
-        :param row_content: the value of a row
+        :param row_content: a string of shortcuts representing the row
+
         :return: A json object of the row
         """
         row_json_object = json.loads('{"row" : []}')
@@ -552,12 +557,11 @@ class Construction:
 
 # TODO is pos rly needed
 # TODO type hinting tile
+# TODO this should be in the Utilities module
 def create_tile(shortcut: str, pos: Tuple[int, int], rel_pos: Tuple[int, int], structure=None):
     """
     This method creates a Tile based on the identifying shortcut.
 
-    Parameter
-    ---------
     :param shortcut: The shortcut which the Tile is based on
     :param pos: the absolute position of the Tile
     :param rel_pos: the relative position of the Tile
@@ -565,7 +569,7 @@ def create_tile(shortcut: str, pos: Tuple[int, int], rel_pos: Tuple[int, int], s
 
     Returns
     -------
-    :return: A Tile
+        :returns: A Tile
     """
     if shortcut == Tiles.NormalTile.shortcut:
         temp = Tiles.NormalTile(pos, rel_pos)

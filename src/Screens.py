@@ -30,14 +30,26 @@ from src.Utilities import ColorHex, get_system_path_from_relative_path
 
 
 class Textfield:
+    """
+        A wrapper class for an tkinter.Entry
+    """
     def __init__(self, screen, side=None, pad_y=None, pad_x=None):
         self.entry = tkinter.Entry(screen)
         self.entry.pack(side=side, pady=pad_y, padx=pad_x)
 
     def get_user_input(self) -> str:
+        """
+            the user-input from the textfield
+
+            Returns
+            -------
+                str
+                    the value from the textfield
+        """
         return self.entry.get()
 
     def mark_false_input(self, text):
+        """marks the textfield input als false"""
         self.entry["bg"] = ColorHex.red
         self.entry.delete(0, len(self.entry.get()))
         self.entry.insert(0, text)
@@ -185,7 +197,7 @@ class TileScreen:
 
     def back_to_main_frame(self) -> None:
         """
-            desstroys the construction frame and opens the Tile overview
+            destroys the construction frame and opens the Tile overview
         """
         self.construction_frame.destroy()
         self.create_overview_frame()
@@ -364,7 +376,7 @@ class SaveMenu(tkinter.Frame):
         input_is_valid: bool = True
         self.input_textfield.entry["bg"] = ColorHex.white
 
-        user_input: str = self.input_textfield.get_user_input()
+        user_input: str = self.input_textfield.get_user_input
 
         for symbol in self.forbidden_characters:
             if symbol in user_input:
@@ -411,6 +423,9 @@ class MainMenu:
         # TODO LOG logger.info("Started Main Menue")
 
     def options(self):
+        """
+            opens the options screen
+        """
         # TODO LOG logger.info("Opened Options from Main Menu")
         self.main_frame.destroy()
         self.option_frame = OptionFrame(self.root)
@@ -419,12 +434,18 @@ class MainMenu:
         # TODO LOG logger.info("Opened Options")
 
     def back_to_myself(self):
+        """
+            back to the root menu
+        """
         for ele in self.root.winfo_children():
             ele.destroy()
 
         self.main_menu_components()
 
     def main_menu_components(self):
+        """
+            creates the main menu components
+        """
         self.main_frame = tkinter.Frame(self.root)
         self.main_frame.grid()
 
@@ -441,6 +462,9 @@ class MainMenu:
         close_button.grid(row=3, column=3)
 
     def load_game(self):
+        """
+            opens the load game menu
+        """
         # TODO LOG logger.info("Load Game")
         self.main_frame.destroy()
 
@@ -457,6 +481,9 @@ class MainMenu:
         create_button(self.load_game_sub_frame, "Back", self.back_to_myself, 200, 300)
 
     def new_game(self):
+        """
+            opens the new game screen
+        """
         # TODO LOG logger.info("New Game")
         self.main_frame.destroy()
         self.new_game_sub_frame = tkinter.Frame(self.root).pack()
@@ -475,12 +502,22 @@ class MainMenu:
         create_button(self.new_game_sub_frame, "Back", self.back_to_myself, 200, 300)
 
     def close_main_menu(self):
+        """
+            closes the main menu
+        """
         self.root.destroy()
 
     def start(self):
+        """
+            the tk screens
+        """
         self.root.mainloop()
 
     def start_game(self, map_to_load: str):
+        """
+            startes the game from a file
+        :param map_to_load: the path to the level file
+        """
         self.root.destroy()
         # TODO LOG logger.info("Start Game")
         map_path = map_to_load
@@ -494,7 +531,12 @@ class MainMenu:
         # new_game.level = level
         new_game.execute()
 
-    def make_game_saves_widget(self, save_path, file):
+    def make_game_saves_widget(self, save_path: str, file: str):
+        """
+            makes the wigets for the saved games screen
+        :param save_path: the path were the sve files are
+        :param file: the file name
+        """
         b = tkinter.Button(master=self.load_game_sub_frame, text=file[:-5],
                            command=lambda p=save_path: self.start_game(p))
         b.place(x=100, y=self.y_pos)
@@ -502,6 +544,9 @@ class MainMenu:
 
 
 class OptionFrame(tkinter.Frame):
+    """
+        the options screen as an own class
+    """
     def __init__(self, master, game=None):
         self.game = game
         super().__init__(master)
@@ -521,6 +566,9 @@ class OptionFrame(tkinter.Frame):
         create_button(self.pack(), "Save options", self.save_options, 100, 300)
 
     def save_options(self):
+        """
+            saves all options
+        """
         cfg.set_value(cfg.sound_section, cfg.music_volume_option, str(self.scale_music_vol.get() / 100))
         cfg.set_value(cfg.sound_section, cfg.sfx_volume_option, str(self.scale_effects_vol.get() / 100))
 
@@ -553,6 +601,18 @@ def create_label(screen, text: str, xPos: int, yPos: int, justify="left", bg_col
 
 
 def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_color=None, bd=5) -> tkinter.Button:
+    """
+    creates a tkinter button
+
+    :param screen:
+    :param text:
+    :param command:
+    :param xPos:
+    :param yPos:
+    :param bg_color:
+    :param bd:
+    :return: a tkinter button
+    """
     button = tkinter.Button(screen, text=text, command=command)
     button["bg"] = bg_color
     button["bd"] = bd
@@ -561,11 +621,22 @@ def create_button(screen, text: str, command: str, xPos: int, yPos: int, bg_colo
 
 
 class MyImage:
+    """
+        for the tile screen
+    """
     def __init__(self, screen, image_path: str):
         self.img = tkinter.PhotoImage(file=image_path, master=screen)
         self.screen = screen
 
     def create_image(self, side, height, width, fill=None):
+        """
+        Creates label with a image as its content
+        :param side: where to pack
+        :param height: wanted height
+        :param width: wanted height
+        :param fill: how to fill
+        :return: a label with a image as its content
+        """
         scale_w = round(width / self.img.width())
         scale_h = round(height / self.img.height())
         self.img = self.img.zoom(scale_w, scale_h)
@@ -577,9 +648,19 @@ class MyImage:
 
 
 class GuiFactoryPack:
+    """
+        A factory for easy creating tkinter Gui components
+    """
 
     @staticmethod
     def button(text: str, command, master=None):
+        """
+        creates a tk.Button
+        :param text: the text of the button
+        :param command: what happens if the button is pressed
+        :param master: the root
+        :return: a tk.Button
+        """
         button = tkinter.Button(master)
         button["text"] = text
         button["command"] = command
@@ -587,6 +668,12 @@ class GuiFactoryPack:
 
     @staticmethod
     def label(text: str, master=None):
+        """
+        creates a a tk.Label
+        :param text: of the label
+        :param master: the root
+        :return: a tk.Label
+        """
         label = tkinter.Label(master)
         label["text"] = text
         return label
