@@ -49,11 +49,12 @@
       }
     ],
     "misc": "None",
-    "season": "Winter"
+    "season": "Winter",
+    "difficulty": 0.5
   },
   "resources": {
-    "wood": 50,
-    "stone": 30,
-    "iron": 30
+    "wood": 150,
+    "stone": 130,
+    "iron": 130
   }
 }

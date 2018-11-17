@@ -1,46 +1,57 @@
-import os
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+This module holds all Tiles for the game.
+
+Import
+------
+    os
+        used to get the parent_dir
+    random
+        used to get a random element from a list
+    pygame
+        the game engine for the game
+    logging
+        basic python logging
+    Structures
+        for type hinting
+    Game
+        for type hinting
+    Tuple
+        for type hinting
+    Surface
+        for type hinting
+
+"""
 import random
+from typing import Tuple, ClassVar
+
 import pygame
+from pygame import Surface
 
-import logging
-
-from src import Structures, Game
-
-parent_dir = os.path.dirname(os.getcwd())
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# create a file handler
-handler = logging.FileHandler(os.path.join(os.path.dirname(os.getcwd()), "logs/GameLog.log"))
-handler.setLevel(logging.INFO)
-
-# create a logging format
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-
-# add the handlers to the logger
-logger.addHandler(handler)
+from src.GameMechanics import Construction
+from src.Structures import Structure
+from src.Utilities import get_system_path_from_relative_path
 
 
 class Tile:
-    name = None
-    bg_img = None
+    name: str = None
+    bg_img: Surface = None
     img_path: str
-    tile_pos = None
-    associated_structure_pos = None
-    has_structure = False
-    structure = False
+    tile_pos: Tuple[int, int] = None
+    associated_structure_pos: Tuple[int, int] = None
+    has_structure: bool = False
+    _structure: bool = False
     shortcut: str = "D"
-    rect = None
-    rel_pos_tuple = ()
-    is_in_territory = False
-    construction: Game.Construction = None
-    x_offset : int = 16
-    y_offset : int = 16
-    green_boarder = os.path.join(parent_dir, "textures/utils/greenBoarder.png")
+    rel_pos_tuple: Tuple[int, int] = ()
+    is_in_territory: bool = False
+    construction: Construction = None
+    x_offset: int = 16
+    y_offset: int = 16
+    green_boarder: str = get_system_path_from_relative_path("textures/utils/greenBoarder.png")
 
-    def __init__(self, name, bg_img, img_path, tile_pos, rel_pos):
+    def __init__(self, name: str, bg_img: Surface, img_path: str, tile_pos: Tuple[int, int],
+                 rel_pos: Tuple[int, int]) -> None:
         self.name = name
         self.tile_pos = tile_pos
         self.bg_img = bg_img
@@ -48,26 +59,50 @@ class Tile:
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         out_str = self.name
         return out_str
 
-    def set_structure(self, structure: Structures.Structure):
+    def set_structure(self, structure: Structure) -> None:
+        """
+        Sets a _structure of a tile and turns the 'has_structure' flag true.
+
+        :param structure: the _structure to set
+        """
         self.has_structure = True
-        self.structure = structure
+        self._structure: Structure = structure
 
-    def get_structure(self) -> Structures:
-        return self.structure
+    def get_structure(self) -> Structure:
+        """
+        Gets you the structure of the tile
 
-    def set_new_pos(self, tile_pos):
+        :return: the structure of the tile
+        """
+        return self._structure
+
+    def set_new_pos(self, tile_pos: Tuple[int, int]) -> None:
+        """
+        Sets the absolute position of the Tile and updates the absolute position of where the structure
+        should be rendered on the Tile
+
+        :param tile_pos: the new absolute position to set
+        """
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + self.x_offset, tile_pos[1] + self.y_offset)
 
-    def is_point_in_tile(self, xPos, yPos):
-        if self.tile_pos[0] + 32 > xPos > self.tile_pos[0]:
-            if self.tile_pos[1] + 32 > yPos > self.tile_pos[1]:
+    def is_point_in_tile(self, x_pos: int, y_pos: int) -> bool:
+        """
+        Tells you if a pair if coordinates is inside the tile.
+
+
+        :param x_pos: the absolute x-Position
+        :param y_pos: the absolute y-Position
+        :return: if the coordinates are in the Tile
+        """
+        if self.tile_pos[0] + 32 > x_pos > self.tile_pos[0]:
+            if self.tile_pos[1] + 32 > y_pos > self.tile_pos[1]:
                 return True
             else:
                 return False
@@ -76,77 +111,93 @@ class Tile:
 
 
 class NormalTile(Tile):
-    shortcut = "N"
-    name = "Normal Ground"
-    img_path = os.path.join(parent_dir, "textures/tiles/normTile.png")
+    """
+    The normal ground Tile.
+    """
+    shortcut: ClassVar[str] = "N"
+    name: ClassVar[str] = "Normal Ground"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/normTile.png")
     x_offset: int = 0
     y_offset: int = 0
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0], tile_pos[1])
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
 
 class ForestTile(Tile):
-    shortcut = "F"
-    name = "Forrest"
-    img_path = os.path.join(parent_dir, "textures/tiles/forestTile.png")
+    """
+    A forest Tile.
+    """
+    shortcut: ClassVar[str] = "F"
+    name: ClassVar[str] = "Forrest"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/forestTile.png")
 
-    def __init__(self, tile_pos, rel_pos):
-        self.img_path = random.choice([os.path.join(parent_dir, "textures/tiles/forestTile.png"),
-                                       os.path.join(parent_dir, "textures/tiles/forestTile2.png")])
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
+        self.img_path = random.choice([get_system_path_from_relative_path("textures/tiles/forestTile.png"),
+                                       get_system_path_from_relative_path("textures/tiles/forestTile2.png")])
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
 
 class MineTile(Tile):
-    shortcut = "PM"  # Potential Mine
-    name = "Mine"
-    img_path = os.path.join(parent_dir, "textures/tiles/mineTile.png")
+    """
+    A Tile where a mine can be build.
+    """
+    shortcut: ClassVar[str] = "PM"  # Potential Mine
+    name: ClassVar[str] = "Mine"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/mineTile.png")
     x_offset: int = 8
     y_offset: int = 8
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
+        print(self.img_path)
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1] + 8)
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
 
 class LakeTile(Tile):
-    shortcut = "L"
-    name = "Lake"
-    img_path = os.path.join(parent_dir, "textures/tiles/lakeTile.png")
+    """
+    The lake Tile.
+    """
+    shortcut: ClassVar[str] = "L"
+    name: ClassVar[str] = "Lake"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/lakeTile.png")
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 16, tile_pos[1] + 16)
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
 
 
 class MountainTile(Tile):
-    shortcut = "M"
-    name = "Mountain"
-    img_path = os.path.join(parent_dir, "textures/tiles/mountainTile.png")
+    """
+    The mountain Tile
+    """
+    shortcut: ClassVar[str] = "M"
+    name: ClassVar[str] = "Mountain"
+    img_path: ClassVar[str] = get_system_path_from_relative_path("textures/tiles/mountainTile.png")
     x_offset: int = 8
     y_offset: int = 0
 
-    def __init__(self, tile_pos, rel_pos):
+    def __init__(self, tile_pos: Tuple[int, int], rel_pos: Tuple[int, int]) -> None:
         self.bg_img = pygame.image.load(self.img_path)
         self.tile_pos = tile_pos
         self.associated_structure_pos = (tile_pos[0] + 8, tile_pos[1])
         self.rel_pos_tuple = rel_pos
 
-        logger.debug("Just created a " + self.name)
+        # TODO LOG logger.debug("Just created a " + self.name)
