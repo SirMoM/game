@@ -23,9 +23,8 @@ import sys
 import tkinter
 from typing import List
 
-from src import Tiles, GameMechanics, Structures
+from src import GameMechanics, Structures
 from src import config as cfg
-from src.GameMechanics import Game
 from src.Utilities import ColorHex, get_system_path_from_relative_path
 
 
@@ -33,6 +32,7 @@ class Textfield:
     """
         A wrapper class for an tkinter.Entry
     """
+
     def __init__(self, screen, side=None, pad_y=None, pad_x=None):
         self.entry = tkinter.Entry(screen)
         self.entry.pack(side=side, pady=pad_y, padx=pad_x)
@@ -76,7 +76,7 @@ class TileScreen:
     The Tile screen
     """
 
-    def __init__(self, game: GameMechanics.Game, tile: Tiles.Tile):
+    def __init__(self, game, tile):
         # TODO LOG logger.debug("Opend a Tile screen with a" + tile.__str__() + "Tile")
         self.game = game
         self.level = game.level
@@ -125,7 +125,7 @@ class TileScreen:
         self.overview_frame.pack(fill=tkinter.BOTH, ipady=10, pady=5, expand=True)
 
         structure_base_str = "Structure: {0}"
-        resource_base_str = "Resources: {0:.1f} {1} per second"
+        resource_base_str = "ResourceType: {0:.1f} {1} per second"
         is_in_territory_base_str = "This area is {0} in your Territory"
 
         if self.tile.get_structure():
@@ -179,7 +179,7 @@ class TileScreen:
         construction_options = tkinter.Listbox(self.construction_frame, height=5)
 
         counter = 0
-        for option in self.get_construction_options():
+        for option in self.get_construction_options():  # type: Structures.Structure
             construction_options.insert(counter, option.name)
             counter += 1
 
@@ -202,13 +202,13 @@ class TileScreen:
         self.construction_frame.destroy()
         self.create_overview_frame()
 
-    def get_construction_options(self) -> None:
+    def get_construction_options(self) -> List[Structures.Structure]:
         """
             checks what Structures can be build on this Tile
         """
-        all_structures = get_all_structures()
+        all_structures: List[Structures.Structure] = get_all_structures()
 
-        construction_options = []
+        construction_options: List[Structures.Structure] = []
         for structure in all_structures:
             print(structure)
             if structure.can_build(self.tile):
@@ -235,7 +235,7 @@ class InGameMenu:
         The in-game Menu screen.
     """
 
-    def __init__(self, game: GameMechanics.Game):
+    def __init__(self, game):
         self.game = game
         self.is_active = True
         self.game.pause = True
@@ -344,11 +344,11 @@ class SaveMenu(tkinter.Frame):
 
     """
     forbidden_characters: List[str] = ['/', '\\', '<', '>', ':', '"', '|', '?', '*', ' ', '.']
-    game: Game
+    game = None
     is_active: bool
     input_textfield: Textfield
 
-    def __init__(self, root: tkinter.Tk, game: Game) -> None:
+    def __init__(self, root: tkinter.Tk, game) -> None:
         self.game = game
         self.is_active = True
 
@@ -547,6 +547,7 @@ class OptionFrame(tkinter.Frame):
     """
         the options screen as an own class
     """
+
     def __init__(self, master, game=None):
         self.game = game
         super().__init__(master)
@@ -624,6 +625,7 @@ class MyImage:
     """
         for the tile screen
     """
+
     def __init__(self, screen, image_path: str):
         self.img = tkinter.PhotoImage(file=image_path, master=screen)
         self.screen = screen

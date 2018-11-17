@@ -4,11 +4,12 @@ from typing import ClassVar, List
 import pygame
 
 from src import Tiles, GameMechanics
+from src.Utilities import ResourceType
 
 parent_dir = os.path.dirname(os.getcwd())
 
 
-class Structure(object):
+class Structure:
     resources_per_loop: float
     name: str
     structure_img: str
@@ -16,13 +17,17 @@ class Structure(object):
     resources_type: str
     build_costs = None
 
-    def __init__(self, name, img):
-        self.structure_img = img
-        self.name = name
-
     def __str__(self):
-        out_str = self.name + "Resource: " + self.resources_type
-        return out_str
+        cost_str: str = "Costs per sek: Wood {} Stone {} Iron {}".format(self.build_costs[0], self.build_costs[1],
+                                                                         self.build_costs[2])
+        res_str: str = "Generates {} {} per sek".format(self.resources_per_loop, self.resources_type.name)
+        str_out: str = "########################################## \n"
+        str_out = str_out + "#{:^40}# \n".format(self.name)
+        str_out = str_out + "#{:^40}# \n".format(cost_str)
+        str_out = str_out + "#{:^40}# \n".format("It takes " + self.build_time.__str__() + " sek to build")
+        str_out = str_out + "#{:^40}# \n".format(res_str)
+        str_out = str_out + "########################################## \n"
+        return str_out
 
     @staticmethod
     def can_build(tile) -> bool:
@@ -43,7 +48,7 @@ class Structure(object):
 class LumberJack(Structure):
     resources_per_loop: float = 1.0
     shortcut: ClassVar[str] = "LJ"
-    resources_type: ClassVar[str] = "Wood"
+    resources_type: ClassVar[ResourceType] = ResourceType.WOOD
     name: ClassVar[str] = "Lumber Jack"
     build_costs = 4, 0, 0
     build_time: int = 3
@@ -73,11 +78,11 @@ class LumberJack(Structure):
 class LumberJackTierTwo(Structure):
     resources_per_loop: ClassVar[float] = 2.0
     shortcut: ClassVar[str] = "LJ2"
-    resources_type: ClassVar[str] = "Wood"
+    resources_type: ClassVar[ResourceType] = ResourceType.WOOD
 
     name: ClassVar[str] = "Lumber Jack T2"
     build_costs = 20, 10, 5
-    build_time: ClassVar[int] = 10
+    build_time: ClassVar[int] = 2
 
     def __init__(self):
         self.structure_img = pygame.image.load(os.path.join(parent_dir, "textures/structures/lumberJackTII.png"))
@@ -105,7 +110,7 @@ class LumberJackTierTwo(Structure):
 class Quarry(Structure):
     resources_per_loop: ClassVar[int] = 0.5
     shortcut: ClassVar[str] = "Q"
-    resources_type: ClassVar[str] = "Stone"
+    resources_type: ClassVar[ResourceType] = ResourceType.STONE
     name: ClassVar[str] = "Quarry"
     build_costs = 10, 0, 0
     build_time: ClassVar[int] = 6
@@ -135,7 +140,7 @@ class Quarry(Structure):
 class IronMine(Structure):
     resources_per_loop: ClassVar[float] = 0.3
     shortcut: ClassVar[str] = "IM"
-    resources_type: ClassVar[str] = "Iron"
+    resources_type: ClassVar[ResourceType] = ResourceType.IRON
     name: ClassVar[str] = "Iron Mine"
 
     build_costs = 8, 5, 0
@@ -164,12 +169,12 @@ class IronMine(Structure):
 
 
 class Castle(Structure):
-    resources_per_loop: ClassVar[float] = 0.0
-    resources_type = None
+    resources_per_loop: ClassVar[float] = None
+    resources_type: ResourceType = ResourceType.NONE
     shortcut: ClassVar[str] = "C"
     name: ClassVar[str] = "Castle"
-    build_costs = 5, 5, 5
-    build_time: int = 10
+    build_costs = 50, 50, 50
+    build_time: int = 1
     tile_range: ClassVar[int] = 2
     tile = None  # type: Tiles.Tile
     level = None  # type: GameMechanics.Level

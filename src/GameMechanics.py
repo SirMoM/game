@@ -27,7 +27,7 @@ from pygame.mixer import Sound
 from src import Screens, Tiles, Structures
 from src import config as cfg
 from src.Structures import StructureException, Structure
-from src.Utilities import ColorRGB, get_system_path_from_relative_path
+from src.Utilities import ColorRGB, get_system_path_from_relative_path, ResourceType
 
 
 class Level:
@@ -69,7 +69,7 @@ class Level:
 
 class Game:
     width: int = 1000
-    height: int = 1000
+    height: int = 800
     x_offset: int = 200
     y_offset: int = 100
     running: bool = False
@@ -152,17 +152,14 @@ class Game:
         for event in pygame.event.get():
             if event.type == self.resources_event_id:
                 pygame.time.set_timer(self.resources_event_id, 1000)
-                for structure in self.level.structures:
-                    if type(structure) is Structures.LumberJack:
+                for structure in self.level.structures:  # type: Structure
+                    if structure.resources_type == ResourceType.WOOD:
                         self.level.wood += structure.resources_per_loop
                         # TODO logger.info("Wood addes: " + self.level.wood.__str__())
-                    if type(structure) is Structures.LumberJackTierTwo:
-                        self.level.wood += structure.resources_per_loop
-                        # TODO logger.info("Wood added: " + self.level.wood.__str__())
-                    elif type(structure) is Structures.Quarry:
+                    if structure.resources_type == ResourceType.STONE:
                         self.level.stone += structure.resources_per_loop
                         # TODO logger.info("Stone added: " + self.level.stone.__str__())
-                    elif type(structure) is Structures.IronMine:
+                    if structure.resources_type == ResourceType.IRON:
                         self.level.iron += structure.resources_per_loop
                         # TODO logger.info("Iron added: " + self.level.iron.__str__())
 
@@ -353,7 +350,7 @@ class LevelParser:
 
         # TODO logger.info("Miscellaneous: " + save_game_as_json_object[self.mapVar][self.miscVar])
         # TODO logger.info("Season: " + save_game_as_json_object[self.mapVar][self.seasonVar])
-        # TODO logger.info("Resources: " + save_game_as_json_object[self.resourcesVar].__str__())
+        # TODO logger.info("ResourceType: " + save_game_as_json_object[self.resourcesVar].__str__())
 
         for rows in save_game_as_json_object[self.mapVar][self.terrainVar]:
             self.mapAsRowArray.append(rows["row"])
@@ -538,8 +535,6 @@ class Construction:
         """
         Completes a construction.
         """
-        if self.tile.get_structure() is not None:
-            self.level.structures.remove(self.tile.structure)
 
         self.tile.set_structure(self.structure)
         self.tile.construction = None

@@ -13,6 +13,7 @@ Import
         used for type hinting
 """
 import os
+from enum import Enum
 from typing import ClassVar, Tuple
 
 
@@ -97,3 +98,13 @@ def get_system_path_from_relative_path(rel_path: str) -> str:
 
     """
     return os.path.join(os.path.dirname(os.getcwd()), rel_path)
+
+
+class ResourceType(Enum):
+    """
+        A enum for all the resource types
+    """
+    WOOD = "W"
+    STONE = "S"
+    IRON = "I"
+    NONE = "N"
